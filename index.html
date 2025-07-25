@@ -2408,8 +2408,8 @@
                 existingImportBtn.remove();
             }
             
-            // Add import button for diseases, responsible, population, and agePopulation
-            if (type === 'diseases' || type === 'responsible' || type === 'population' || type === 'agePopulation') {
+            // Add import button for diseases, responsible, population, agePopulation, and thailandPopulation
+            if (type === 'diseases' || type === 'responsible' || type === 'population' || type === 'agePopulation' || type === 'thailandPopulation') {
                 const importButton = document.createElement('button');
                 importButton.id = 'importExcelButton';
                 importButton.className = 'btn-secondary';
@@ -2902,25 +2902,21 @@
                         <thead class="table-header">
                             <tr>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">จังหวัด</th>
-                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ภาค</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">จำนวนประชากร</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">ชาย</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">หญิง</th>
-                                <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">ความหนาแน่น (คน/ตร.กม.)</th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">จัดการ</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${thailandPopulation.length === 0 ? 
-                                '<tr><td colspan="7" class="px-6 py-20 text-center text-gray-500"><div class="text-6xl mb-4">🇹🇭</div><p class="font-semibold text-xl text-gray-700">ยังไม่มีข้อมูลประชากรประเทศไทย</p><p class="text-gray-500 mt-2">กรุณาเพิ่มข้อมูลประชากรแต่ละจังหวัด</p></td></tr>' :
+                                '<tr><td colspan="5" class="px-6 py-20 text-center text-gray-500"><div class="text-6xl mb-4">🇹🇭</div><p class="font-semibold text-xl text-gray-700">ยังไม่มีข้อมูลประชากรประเทศไทย</p><p class="text-gray-500 mt-2">กรุณาเพิ่มข้อมูลประชากรแต่ละจังหวัด</p></td></tr>' :
                                 thailandPopulation.map((province, index) => `
                                     <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
                                         <td class="px-6 py-4 font-bold text-blue-600">${province.province}</td>
-                                        <td class="px-6 py-4 font-medium text-green-600">${province.region}</td>
                                         <td class="px-6 py-4 text-right font-semibold text-gray-900">${parseInt(province.total).toLocaleString()}</td>
                                         <td class="px-6 py-4 text-right text-blue-600">${parseInt(province.male).toLocaleString()}</td>
                                         <td class="px-6 py-4 text-right text-pink-600">${parseInt(province.female).toLocaleString()}</td>
-                                        <td class="px-6 py-4 text-right text-purple-600">${parseFloat(province.density).toLocaleString()}</td>
                                         <td class="px-6 py-4 text-center">
                                             <button onclick="editThailandPopulation(${index})" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:from-blue-600 hover:to-blue-700 mr-2 transition-all transform hover:scale-105">แก้ไข</button>
                                             <button onclick="deleteThailandPopulation(${index})" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg text-sm hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105">ลบ</button>
@@ -2934,7 +2930,7 @@
                 
                 <!-- Summary Statistics -->
                 ${thailandPopulation.length > 0 ? `
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-5 gap-6">
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="stat-card">
                             <div class="w-12 h-12 icon-gradient-blue rounded-xl mx-auto mb-4 flex items-center justify-center">
                                 <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
@@ -4615,25 +4611,6 @@
                                 <input type="text" id="thailandProvince" class="w-full input-field" placeholder="เช่น กรุงเทพมหานคร" required>
                             </div>
                             
-                            <!-- Region -->
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">
-                                    <svg class="w-4 h-4 inline mr-2 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z"/>
-                                    </svg>
-                                    ภาค
-                                </label>
-                                <select id="thailandRegion" class="w-full input-field" required>
-                                    <option value="">เลือกภาค</option>
-                                    <option value="ภาคกลาง">ภาคกลาง</option>
-                                    <option value="ภาคเหนือ">ภาคเหนือ</option>
-                                    <option value="ภาคตะวันออกเฉียงเหนือ">ภาคตะวันออกเฉียงเหนือ</option>
-                                    <option value="ภาคใต้">ภาคใต้</option>
-                                    <option value="ภาคตะวันออก">ภาคตะวันออก</option>
-                                    <option value="ภาคตะวันตก">ภาคตะวันตก</option>
-                                </select>
-                            </div>
-                            
                             <!-- Male Population -->
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-3">
@@ -4665,17 +4642,6 @@
                                     จำนวนประชากรรวม
                                 </label>
                                 <input type="number" id="thailandTotal" class="w-full input-field bg-gray-50" readonly>
-                            </div>
-                            
-                            <!-- Population Density -->
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-3">
-                                    <svg class="w-4 h-4 inline mr-2 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z"/>
-                                    </svg>
-                                    ความหนาแน่น (คน/ตร.กม.)
-                                </label>
-                                <input type="number" id="thailandDensity" class="w-full input-field" placeholder="เช่น 5500.5" required min="0" step="0.1">
                             </div>
                         </div>
                         
@@ -4758,10 +4724,8 @@
             
             if (province) {
                 document.getElementById('thailandProvince').value = province.province;
-                document.getElementById('thailandRegion').value = province.region;
                 document.getElementById('thailandMale').value = province.male;
                 document.getElementById('thailandFemale').value = province.female;
-                document.getElementById('thailandDensity').value = province.density;
                 calculateThailandTotal();
             }
         }
@@ -4779,13 +4743,11 @@
             event.preventDefault();
             
             const province = document.getElementById('thailandProvince').value.trim();
-            const region = document.getElementById('thailandRegion').value.trim();
             const male = parseInt(document.getElementById('thailandMale').value) || 0;
             const female = parseInt(document.getElementById('thailandFemale').value) || 0;
             const total = male + female;
-            const density = parseFloat(document.getElementById('thailandDensity').value) || 0;
             
-            if (!province || !region || total <= 0 || density <= 0) {
+            if (!province || total <= 0) {
                 showNotification('กรุณากรอกข้อมูลให้ครบถ้วนและถูกต้อง', 'error');
                 return;
             }
@@ -4816,11 +4778,9 @@
                 
                 const newThailandPopulation = {
                     province,
-                    region,
                     male: male.toString(),
                     female: female.toString(),
-                    total: total.toString(),
-                    density: density.toString()
+                    total: total.toString()
                 };
                 
                 if (editIndex !== null) {
@@ -4865,7 +4825,7 @@
                 return;
             }
             
-            const confirmed = confirm(`คุณต้องการลบข้อมูลประชากรประเทศไทยนี้ใช่หรือไม่?\n\nจังหวัด: ${province.province}\nภาค: ${province.region}\nประชากรรวม: ${parseInt(province.total).toLocaleString()} คน\nความหนาแน่น: ${parseFloat(province.density).toLocaleString()} คน/ตร.กม.\n\nการดำเนินการนี้ไม่สามารถยกเลิกได้`);
+            const confirmed = confirm(`คุณต้องการลบข้อมูลประชากรประเทศไทยนี้ใช่หรือไม่?\n\nจังหวัด: ${province.province}\nประชากรชาย: ${parseInt(province.male).toLocaleString()} คน\nประชากรหญิง: ${parseInt(province.female).toLocaleString()} คน\nประชากรรวม: ${parseInt(province.total).toLocaleString()} คน\n\nการดำเนินการนี้ไม่สามารถยกเลิกได้`);
             
             if (confirmed) {
                 try {
@@ -5516,6 +5476,7 @@
             const isResponsible = dataType === 'responsible';
             const isPopulation = dataType === 'population';
             const isAgePopulation = dataType === 'agePopulation';
+            const isThailandPopulation = dataType === 'thailandPopulation';
             
             let title, icon;
             if (isResponsible) {
@@ -5527,6 +5488,9 @@
             } else if (isAgePopulation) {
                 title = 'นำเข้าข้อมูลประชากรจำแนกตามอายุจากไฟล์ Excel';
                 icon = '👶👵';
+            } else if (isThailandPopulation) {
+                title = 'นำเข้าข้อมูลประชากรประเทศไทยจากไฟล์ Excel';
+                icon = '🇹🇭';
             } else {
                 title = 'นำเข้าข้อมูลโรคจากไฟล์ Excel';
                 icon = '📊';
@@ -5578,6 +5542,12 @@
                                 <p>• <strong>คอลัมน์ C:</strong> 15-59 ปี (เช่น 35000, 42000)</p>
                                 <p>• <strong>คอลัมน์ D:</strong> 60+ ปี (เช่น 8000, 10000)</p>
                                 <p>• <strong>ชื่อเขต:</strong> ต้องไม่ซ้ำกันและไม่เป็นค่าว่าง</p>
+                                <p>• <strong>ตัวเลข:</strong> ต้องเป็นตัวเลขบวกเท่านั้น</p>
+                            ` : isThailandPopulation ? `
+                                <p>• <strong>คอลัมน์ A:</strong> ชื่อจังหวัด (เช่น กรุงเทพมหานคร, เชียงใหม่)</p>
+                                <p>• <strong>คอลัมน์ B:</strong> จำนวนประชากรชาย (เช่น 2500000, 850000)</p>
+                                <p>• <strong>คอลัมน์ C:</strong> จำนวนประชากรหญิง (เช่น 2700000, 920000)</p>
+                                <p>• <strong>ชื่อจังหวัด:</strong> ต้องไม่ซ้ำกันและไม่เป็นค่าว่าง</p>
                                 <p>• <strong>ตัวเลข:</strong> ต้องเป็นตัวเลขบวกเท่านั้น</p>
                             ` : `
                                 <p>• <strong>คอลัมน์ A:</strong> รหัสโรค (เช่น A00, B01, C02)</p>
@@ -5728,6 +5698,75 @@
                             </div>
                             <div class="mt-4 flex justify-center">
                                 <button onclick="downloadAgePopulationExampleFile()" class="btn-secondary text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                    </svg>
+                                    ดาวน์โหลดไฟล์ตัวอย่าง Excel
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${isThailandPopulation ? `
+                        <!-- Example Table for Thailand Population Import -->
+                        <div class="mt-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg">
+                            <h5 class="font-bold text-blue-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                                ตัวอย่างข้อมูลในไฟล์ Excel
+                            </h5>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm border border-gray-300 rounded">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">A</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">B</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">C</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                        <tr class="bg-yellow-50">
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ชื่อจังหวัด</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ประชากรชาย</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ประชากรหญิง</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">กรุงเทพมหานคร</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">2,850,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">3,150,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">เชียงใหม่</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">850,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">920,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">นครราชสีมา</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">1,300,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">1,380,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">ขอนแก่น</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">890,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">940,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">สงขลา</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">720,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">760,000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-xs text-blue-700 space-y-1">
+                                <p>• <strong>แถวสีเหลือง:</strong> หัวตาราง (สามารถข้ามได้โดยเลือก "ข้ามแถวแรก")</p>
+                                <p>• <strong>ชื่อจังหวัด:</strong> ใช้ชื่อจังหวัดทั้ง 77 จังหวัดของไทย</p>
+                                <p>• <strong>ตัวเลขประชากร:</strong> ใส่เฉพาะตัวเลขบวก ไม่ต้องใส่เครื่องหมายจุลภาค</p>
+                                <p>• <strong>ประชากรรวม:</strong> ระบบจะคำนวณอัตโนมัติจากชาย + หญิง</p>
+                            </div>
+                            <div class="mt-4 flex justify-center">
+                                <button onclick="downloadThailandPopulationExampleFile()" class="btn-secondary text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
                                     </svg>
@@ -6031,9 +6070,31 @@
             const isResponsible = dataType === 'responsible';
             const isPopulation = dataType === 'population';
             const isAgePopulation = dataType === 'agePopulation';
+            const isThailandPopulation = dataType === 'thailandPopulation';
             const previewTable = document.getElementById('previewTable');
             
-            if (isAgePopulation) {
+            if (isThailandPopulation) {
+                previewTable.innerHTML = `
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ชื่อจังหวัด</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ประชากรชาย</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ประชากรหญิง</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${previewData.map(row => `
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[0] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[1] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[2] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if (isAgePopulation) {
                 previewTable.innerHTML = `
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -6127,7 +6188,13 @@
             const totalRows = data.length - (skipFirstRow ? 1 : 0);
             let validRows;
             
-            if (isAgePopulation) {
+            if (isThailandPopulation) {
+                validRows = data.slice(startRow).filter(row => 
+                    row[0] && row[0].toString().trim() && // ชื่อจังหวัด
+                    row[1] && !isNaN(Number(row[1])) && Number(row[1]) >= 0 && // ประชากรชาย
+                    row[2] && !isNaN(Number(row[2])) && Number(row[2]) >= 0    // ประชากรหญิง
+                ).length;
+            } else if (isAgePopulation) {
                 validRows = data.slice(startRow).filter(row => 
                     row[0] && row[0].toString().trim() && // ชื่อเขต
                     row[1] && !isNaN(Number(row[1])) && Number(row[1]) >= 0 && // 0-14 ปี
@@ -6186,7 +6253,9 @@
                 const replaceExisting = document.getElementById('replaceExisting').checked;
                 const startRow = skipFirstRow ? 1 : 0;
                 
-                if (dataType === 'agePopulation') {
+                if (dataType === 'thailandPopulation') {
+                    await processThailandPopulationImport(startRow, replaceExisting);
+                } else if (dataType === 'agePopulation') {
                     await processAgePopulationImport(startRow, replaceExisting);
                 } else if (dataType === 'population') {
                     await processPopulationImport(startRow, replaceExisting);
@@ -6198,7 +6267,9 @@
                 
                 // Close modal and refresh table
                 closeImportExcelModal();
-                if (dataType === 'agePopulation') {
+                if (dataType === 'thailandPopulation') {
+                    await loadThailandPopulationTable();
+                } else if (dataType === 'agePopulation') {
                     await loadAgePopulationTable();
                 } else if (dataType === 'population') {
                     await loadPopulationTable();
@@ -6542,6 +6613,94 @@
             showNotification(message, 'success');
         }
 
+        // Process Thailand population import
+        async function processThailandPopulationImport(startRow, replaceExisting) {
+            const processedData = [];
+            const errors = [];
+            const duplicateProvinces = new Set();
+            
+            for (let i = startRow; i < selectedFileData.length; i++) {
+                const row = selectedFileData[i];
+                const province = row[0] ? row[0].toString().trim() : '';
+                const malePopulation = row[1];
+                const femalePopulation = row[2];
+                
+                if (!province) {
+                    if (malePopulation || femalePopulation) {
+                        errors.push(`แถว ${i + 1}: ไม่มีชื่อจังหวัด`);
+                    }
+                    continue;
+                }
+                
+                // Validate numbers
+                if (!malePopulation || isNaN(Number(malePopulation)) || Number(malePopulation) < 0) {
+                    errors.push(`แถว ${i + 1}: ประชากรชายไม่ถูกต้อง`);
+                    continue;
+                }
+                
+                if (!femalePopulation || isNaN(Number(femalePopulation)) || Number(femalePopulation) < 0) {
+                    errors.push(`แถว ${i + 1}: ประชากรหญิงไม่ถูกต้อง`);
+                    continue;
+                }
+                
+                if (duplicateProvinces.has(province)) {
+                    errors.push(`แถว ${i + 1}: จังหวัด "${province}" ซ้ำในไฟล์`);
+                    continue;
+                }
+                
+                duplicateProvinces.add(province);
+                
+                const male = Number(malePopulation);
+                const female = Number(femalePopulation);
+                const total = male + female;
+                
+                processedData.push({
+                    province,
+                    male,
+                    female,
+                    total
+                });
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่พบข้อมูลที่ถูกต้องในไฟล์');
+            }
+            
+            let existingThailandPopulation = await loadFromFirebase('thailandPopulation') || [];
+            if (!replaceExisting) {
+                const existingProvinces = new Set(existingThailandPopulation.map(p => p.province));
+                const duplicateExisting = processedData.filter(p => existingProvinces.has(p.province));
+                
+                if (duplicateExisting.length > 0) {
+                    errors.push(`จังหวัดที่มีข้อมูลแล้ว: ${duplicateExisting.map(p => p.province).join(', ')}`);
+                }
+                
+                const newData = processedData.filter(p => !existingProvinces.has(p.province));
+                processedData.length = 0;
+                processedData.push(...newData);
+            }
+            
+            if (errors.length > 0) {
+                const errorMsg = `พบข้อผิดพลาด ${errors.length} รายการ:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? '\n...' : ''}`;
+                if (!confirm(`${errorMsg}\n\nต้องการดำเนินการต่อกับข้อมูลที่ถูกต้องหรือไม่?`)) {
+                    throw new Error('ยกเลิกการนำเข้าโดยผู้ใช้');
+                }
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่มีข้อมูลใหม่ที่จะนำเข้า');
+            }
+            
+            const finalData = replaceExisting ? processedData : [...existingThailandPopulation, ...processedData];
+            await saveToFirebase('thailandPopulation', finalData);
+            
+            const message = replaceExisting 
+                ? `แทนที่ข้อมูลสำเร็จ! นำเข้า ${processedData.length} รายการ`
+                : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
+            
+            showNotification(message, 'success');
+        }
+
         // Download example Excel file for population
         function downloadPopulationExampleFile() {
             // Create sample data
@@ -6615,6 +6774,79 @@
 
             // Show notification
             showNotification('ดาวน์โหลดไฟล์ตัวอย่างเรียบร้อยแล้ว!', 'success');
+        }
+
+        // Download example Excel file for Thailand population
+        function downloadThailandPopulationExampleFile() {
+            // Create sample data
+            const sampleData = [
+                ['ชื่อจังหวัด', 'ประชากรชาย', 'ประชากรหญิง'],
+                ['กรุงเทพมหานคร', 2850000, 3150000],
+                ['เชียงใหม่', 850000, 920000],
+                ['นครราชสีมา', 1300000, 1380000],
+                ['ขอนแก่น', 890000, 940000],
+                ['สงขลา', 720000, 760000],
+                ['เชียงราย', 640000, 670000],
+                ['อุบลราชธานี', 950000, 1000000],
+                ['สุราษฎร์ธานี', 520000, 540000],
+                ['นครศรีธรรมราช', 780000, 820000],
+                ['พิษณุโลก', 430000, 450000],
+                ['ลำปาง', 380000, 400000],
+                ['อุดรธานี', 800000, 850000],
+                ['ระยอง', 340000, 370000],
+                ['ชลบุรี', 780000, 820000],
+                ['นนทบุรี', 650000, 700000]
+            ];
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sampleData);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 20 },  // ชื่อจังหวัด
+                { wch: 15 },  // ประชากรชาย
+                { wch: 15 }   // ประชากรหญิง
+            ];
+
+            // Style the header row
+            const headerStyle = {
+                font: { bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "87CEEB" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            // Apply header styling
+            ['A1', 'B1', 'C1'].forEach(cell => {
+                if (ws[cell]) ws[cell].s = headerStyle;
+            });
+
+            // Add number formatting for population columns
+            const numberStyle = {
+                numFmt: "#,##0"
+            };
+
+            // Apply number formatting to data rows
+            for (let row = 2; row <= sampleData.length; row++) {
+                ['B', 'C'].forEach(col => {
+                    const cell = col + row;
+                    if (ws[cell]) {
+                        ws[cell].s = numberStyle;
+                    }
+                });
+            }
+
+            XLSX.utils.book_append_sheet(wb, ws, "ประชากรประเทศไทย");
+
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            const filename = `ตัวอย่าง_ประชากรประเทศไทย_${dateStr}.xlsx`;
+
+            // Download the file
+            XLSX.writeFile(wb, filename);
+            
+            showNotification('ดาวน์โหลดไฟล์ตัวอย่างสำเร็จ!', 'success');
         }
 
         // Download example Excel file for age population
