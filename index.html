@@ -2399,6 +2399,32 @@
             const addButton = document.getElementById('addNewButton');
             addButton.onclick = () => addNewMasterData(type);
             
+            // Set up import button for diseases
+            const buttonContainer = addButton.parentElement;
+            
+            // Remove existing import button if any
+            const existingImportBtn = document.getElementById('importExcelButton');
+            if (existingImportBtn) {
+                existingImportBtn.remove();
+            }
+            
+            // Add import button for diseases, responsible, and population
+            if (type === 'diseases' || type === 'responsible' || type === 'population') {
+                const importButton = document.createElement('button');
+                importButton.id = 'importExcelButton';
+                importButton.className = 'btn-secondary';
+                importButton.innerHTML = `
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                    </svg>
+                    นำเข้า Excel
+                `;
+                importButton.onclick = () => showImportExcelModal(type);
+                
+                // Insert before the add button
+                buttonContainer.insertBefore(importButton, addButton);
+            }
+            
             loadMasterDataDetail(type);
         }
 
@@ -2437,10 +2463,30 @@
             const content = document.getElementById('masterDataDetailContent');
             
             content.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3">
+                                <div class="text-gray-600 text-sm">จำนวนโรคทั้งหมด</div>
+                                <div class="text-2xl font-bold text-blue-600">${diseases.length}</div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 mr-2 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                                </svg>
+                                <strong>รูปแบบไฟล์ Excel:</strong> คอลัมน์ A = รหัสโรค, คอลัมน์ B = ชื่อโรค
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="w-full">
                         <thead class="table-header">
                             <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ลำดับ</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">รหัสโรค</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ชื่อโรค</th>
                                 <th class="px-6 py-4 text-center text-xs font-bold text-gray-600 uppercase tracking-wider">จัดการ</th>
@@ -2448,14 +2494,43 @@
                         </thead>
                         <tbody>
                             ${diseases.length === 0 ? 
-                                '<tr><td colspan="3" class="px-6 py-20 text-center text-gray-500"><div class="text-6xl mb-4">📋</div><p class="font-semibold text-xl text-gray-700">ยังไม่มีข้อมูล</p></td></tr>' :
+                                `<tr><td colspan="4" class="px-6 py-20 text-center text-gray-500">
+                                    <div class="text-6xl mb-4">📋</div>
+                                    <p class="font-semibold text-xl text-gray-700 mb-2">ยังไม่มีข้อมูลโรค</p>
+                                    <p class="text-gray-500 mb-4">เริ่มต้นด้วยการเพิ่มข้อมูลรายโรคหรือนำเข้าจากไฟล์ Excel</p>
+                                    <div class="flex justify-center space-x-4">
+                                        <button onclick="addNewMasterData('diseases')" class="btn-primary text-sm">
+                                            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                            </svg>
+                                            เพิ่มรายโรค
+                                        </button>
+                                        <button onclick="showImportExcelModal()" class="btn-secondary text-sm">
+                                            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                            </svg>
+                                            นำเข้า Excel
+                                        </button>
+                                    </div>
+                                </td></tr>` :
                                 diseases.map((disease, index) => `
-                                    <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                    <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50">
+                                        <td class="px-6 py-4 text-sm text-gray-600">${index + 1}</td>
                                         <td class="px-6 py-4 font-bold text-blue-600">${disease.code}</td>
                                         <td class="px-6 py-4 font-semibold text-gray-900">${disease.name}</td>
                                         <td class="px-6 py-4 text-center">
-                                            <button onclick="editDisease(${index})" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:from-blue-600 hover:to-blue-700 mr-2 transition-all transform hover:scale-105">แก้ไข</button>
-                                            <button onclick="deleteDisease(${index})" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg text-sm hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105">ลบ</button>
+                                            <div class="flex justify-center space-x-2">
+                                                <button onclick="editDisease(${index})" class="text-blue-600 hover:text-blue-900 transition-colors p-1 rounded">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="deleteDisease(${index})" class="text-red-600 hover:text-red-900 transition-colors p-1 rounded">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 `).join('')
@@ -2463,6 +2538,22 @@
                         </tbody>
                     </table>
                 </div>
+                
+                ${diseases.length > 0 ? `
+                    <div class="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
+                        <h4 class="font-bold text-gray-700 mb-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                            </svg>
+                            สรุปข้อมูลโรค
+                        </h4>
+                        <div class="text-sm text-gray-600">
+                            <p>• มีข้อมูลโรคทั้งหมด <strong class="text-blue-600">${diseases.length}</strong> โรค</p>
+                            <p>• สามารถเพิ่มข้อมูลเพิ่มเติมได้ทีละรายการหรือนำเข้าจากไฟล์ Excel</p>
+                            <p>• รหัสโรคแต่ละตัวต้องไม่ซ้ำกัน</p>
+                        </div>
+                    </div>
+                ` : ''}
             `;
         }
 
@@ -2473,10 +2564,38 @@
             const content = document.getElementById('masterDataDetailContent');
             
             content.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3">
+                                <div class="text-gray-600 text-sm">จำนวนผู้รับผิดชอบ</div>
+                                <div class="text-2xl font-bold text-blue-600">${responsible.length}</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-3">
+                                <div class="text-gray-600 text-sm">โรคที่มีผู้รับผิดชอบ</div>
+                                <div class="text-2xl font-bold text-green-600">${responsible.length}</div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-3 max-w-md">
+                            <div class="flex items-start">
+                                <svg class="w-4 h-4 mr-2 text-yellow-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                                </svg>
+                                <div>
+                                    <strong>รูปแบบไฟล์ Excel:</strong><br>
+                                    A=รหัสโรค, B=ชื่อผู้รับผิดชอบ, C=ตำแหน่ง<br>
+                                    D=ชื่อผู้ตรวจทาน, E=ตำแหน่งผู้ตรวจทาน
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="w-full">
                         <thead class="table-header">
                             <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ลำดับ</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">รหัสโรค</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ชื่อโรค</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ผู้รับผิดชอบ</th>
@@ -2488,20 +2607,49 @@
                         </thead>
                         <tbody>
                             ${responsible.length === 0 ? 
-                                '<tr><td colspan="7" class="px-6 py-20 text-center text-gray-500"><div class="text-6xl mb-4">📋</div><p class="font-semibold text-xl text-gray-700">ยังไม่มีข้อมูล</p></td></tr>' :
+                                `<tr><td colspan="8" class="px-6 py-20 text-center text-gray-500">
+                                    <div class="text-6xl mb-4">�</div>
+                                    <p class="font-semibold text-xl text-gray-700 mb-2">ยังไม่มีข้อมูลผู้รับผิดชอบ</p>
+                                    <p class="text-gray-500 mb-4">เริ่มต้นด้วยการเพิ่มข้อมูลผู้รับผิดชอบหรือนำเข้าจากไฟล์ Excel</p>
+                                    <div class="flex justify-center space-x-4">
+                                        <button onclick="addNewMasterData('responsible')" class="btn-primary text-sm">
+                                            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                            </svg>
+                                            เพิ่มผู้รับผิดชอบ
+                                        </button>
+                                        <button onclick="showImportExcelModal('responsible')" class="btn-secondary text-sm">
+                                            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                            </svg>
+                                            นำเข้า Excel
+                                        </button>
+                                    </div>
+                                </td></tr>` :
                                 responsible.map((resp, index) => {
                                     const disease = diseases.find(d => d.code === resp.diseaseCode);
                                     return `
-                                        <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                        <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50">
+                                            <td class="px-6 py-4 text-sm text-gray-600">${index + 1}</td>
                                             <td class="px-6 py-4 font-bold text-blue-600">${resp.diseaseCode}</td>
-                                            <td class="px-6 py-4 font-semibold text-gray-900">${disease ? disease.name : '-'}</td>
-                                            <td class="px-6 py-4 font-medium">${resp.responsibleName}</td>
+                                            <td class="px-6 py-4 font-semibold text-gray-900">${disease ? disease.name : 'ไม่พบข้อมูลโรค'}</td>
+                                            <td class="px-6 py-4 font-medium text-gray-900">${resp.responsibleName}</td>
                                             <td class="px-6 py-4 text-gray-600">${resp.responsiblePosition}</td>
-                                            <td class="px-6 py-4 font-medium">${resp.reviewerName}</td>
+                                            <td class="px-6 py-4 font-medium text-gray-900">${resp.reviewerName}</td>
                                             <td class="px-6 py-4 text-gray-600">${resp.reviewerPosition}</td>
                                             <td class="px-6 py-4 text-center">
-                                                <button onclick="editResponsible(${index})" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:from-blue-600 hover:to-blue-700 mr-2 transition-all transform hover:scale-105">แก้ไข</button>
-                                                <button onclick="deleteResponsible(${index})" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg text-sm hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105">ลบ</button>
+                                                <div class="flex justify-center space-x-2">
+                                                    <button onclick="editResponsible(${index})" class="text-blue-600 hover:text-blue-900 transition-colors p-1 rounded">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                                        </svg>
+                                                    </button>
+                                                    <button onclick="deleteResponsible(${index})" class="text-red-600 hover:text-red-900 transition-colors p-1 rounded">
+                                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                                                        </svg>
+                                                    </button>
+                                                </div>
                                             </td>
                                         </tr>
                                     `;
@@ -2510,6 +2658,22 @@
                         </tbody>
                     </table>
                 </div>
+                
+                ${responsible.length > 0 ? `
+                    <div class="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
+                        <h4 class="font-bold text-gray-700 mb-2 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                            </svg>
+                            สรุปข้อมูลผู้รับผิดชอบ
+                        </h4>
+                        <div class="text-sm text-gray-600">
+                            <p>• มีผู้รับผิดชอบทั้งหมด <strong class="text-blue-600">${responsible.length}</strong> คน</p>
+                            <p>• รหัสโรคแต่ละตัวควรมีผู้รับผิดชอบเพียงคนเดียว</p>
+                            <p>• ข้อมูลผู้รับผิดชอบต้องครบถ้วนทั้งผู้รับผิดชอบและผู้ตรวจทาน</p>
+                        </div>
+                    </div>
+                ` : ''}
             `;
         }
 
@@ -2518,11 +2682,46 @@
             const population = await loadFromFirebase('population');
             const content = document.getElementById('masterDataDetailContent');
             
+            // Calculate totals for summary
+            const totalPopulation = population.reduce((sum, pop) => sum + parseInt(pop.totalPopulation || pop.malePopulation + pop.femalePopulation || 0), 0);
+            const totalMale = population.reduce((sum, pop) => sum + parseInt(pop.malePopulation || 0), 0);
+            const totalFemale = population.reduce((sum, pop) => sum + parseInt(pop.femalePopulation || 0), 0);
+            const avgDensity = population.length > 0 ? 
+                population.reduce((sum, pop) => sum + parseFloat(pop.density || 0), 0) / population.length : 0;
+            
             content.innerHTML = `
+                <div class="mb-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3">
+                                <div class="text-gray-600 text-sm">จำนวนเขต</div>
+                                <div class="text-2xl font-bold text-blue-600">${population.length}</div>
+                            </div>
+                            <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-3">
+                                <div class="text-gray-600 text-sm">ประชากรรวม</div>
+                                <div class="text-2xl font-bold text-green-600">${totalPopulation.toLocaleString()}</div>
+                            </div>
+                        </div>
+                        <div class="text-sm text-gray-600 bg-yellow-50 border border-yellow-200 rounded-lg p-3 max-w-md">
+                            <div class="flex items-start">
+                                <svg class="w-4 h-4 mr-2 text-yellow-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                                </svg>
+                                <div>
+                                    <strong>รูปแบบไฟล์ Excel:</strong><br>
+                                    A=เขต, B=ประชากรชาย, C=ประชากรหญิง<br>
+                                    D=ความหนาแน่น (คน/ตร.กม.)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-container">
                     <table class="w-full">
                         <thead class="table-header">
                             <tr>
+                                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">ลำดับ</th>
                                 <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">เขต</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">จำนวนประชากร</th>
                                 <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">ชาย</th>
@@ -2533,17 +2732,46 @@
                         </thead>
                         <tbody>
                             ${population.length === 0 ? 
-                                '<tr><td colspan="6" class="px-6 py-20 text-center text-gray-500"><div class="text-6xl mb-4">🏙️</div><p class="font-semibold text-xl text-gray-700">ยังไม่มีข้อมูลประชากร</p><p class="text-gray-500 mt-2">กรุณาเพิ่มข้อมูลประชากรแต่ละเขต</p></td></tr>' :
+                                `<tr><td colspan="7" class="px-6 py-20 text-center text-gray-500">
+                                    <div class="text-6xl mb-4">🏙️</div>
+                                    <p class="font-semibold text-xl text-gray-700 mb-2">ยังไม่มีข้อมูลประชากร</p>
+                                    <p class="text-gray-500 mb-4">เริ่มต้นด้วยการเพิ่มข้อมูลประชากรหรือนำเข้าจากไฟล์ Excel</p>
+                                    <div class="flex justify-center space-x-4">
+                                        <button onclick="addNewMasterData('population')" class="btn-primary text-sm">
+                                            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                                            </svg>
+                                            เพิ่มข้อมูลประชากร
+                                        </button>
+                                        <button onclick="showImportExcelModal('population')" class="btn-secondary text-sm">
+                                            <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                            </svg>
+                                            นำเข้า Excel
+                                        </button>
+                                    </div>
+                                </td></tr>` :
                                 population.map((pop, index) => `
-                                    <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                                    <tr class="table-row transition-all duration-300 border-b border-gray-100 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50">
+                                        <td class="px-6 py-4 text-sm text-gray-600">${index + 1}</td>
                                         <td class="px-6 py-4 font-bold text-blue-600">${pop.district}</td>
-                                        <td class="px-6 py-4 text-right font-semibold text-gray-900">${parseInt(pop.total).toLocaleString()}</td>
-                                        <td class="px-6 py-4 text-right text-blue-600">${parseInt(pop.male).toLocaleString()}</td>
-                                        <td class="px-6 py-4 text-right text-pink-600">${parseInt(pop.female).toLocaleString()}</td>
+                                        <td class="px-6 py-4 text-right font-semibold text-gray-900">${(pop.totalPopulation || pop.malePopulation + pop.femalePopulation).toLocaleString()}</td>
+                                        <td class="px-6 py-4 text-right text-blue-600">${pop.malePopulation.toLocaleString()}</td>
+                                        <td class="px-6 py-4 text-right text-pink-600">${pop.femalePopulation.toLocaleString()}</td>
                                         <td class="px-6 py-4 text-right text-green-600">${parseFloat(pop.density).toLocaleString()}</td>
                                         <td class="px-6 py-4 text-center">
-                                            <button onclick="editPopulation(${index})" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:from-blue-600 hover:to-blue-700 mr-2 transition-all transform hover:scale-105">แก้ไข</button>
-                                            <button onclick="deletePopulation(${index})" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 rounded-lg text-sm hover:from-red-600 hover:to-red-700 transition-all transform hover:scale-105">ลบ</button>
+                                            <div class="flex justify-center space-x-2">
+                                                <button onclick="editPopulation(${index})" class="text-blue-600 hover:text-blue-900 transition-colors p-1 rounded">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="deletePopulation(${index})" class="text-red-600 hover:text-red-900 transition-colors p-1 rounded">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 `).join('')
@@ -2552,47 +2780,35 @@
                     </table>
                 </div>
                 
-                <!-- Summary Statistics -->
                 ${population.length > 0 ? `
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-                        <div class="stat-card">
-                            <div class="w-12 h-12 icon-gradient-blue rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z"/>
-                                </svg>
+                    <div class="mt-6 p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg">
+                        <h4 class="font-bold text-gray-700 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                            </svg>
+                            สรุปข้อมูลประชากรกรุงเทพมหานคร
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">ประชากรรวม</div>
+                                <div class="text-xl font-bold text-blue-600">${totalPopulation.toLocaleString()} คน</div>
                             </div>
-                            <div class="text-2xl font-bold text-gray-900 mb-2">${population.length}</div>
-                            <div class="text-sm text-gray-600 font-medium">เขตทั้งหมด</div>
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">ประชากรชาย</div>
+                                <div class="text-xl font-bold text-green-600">${totalMale.toLocaleString()} คน</div>
+                            </div>
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">ประชากรหญิง</div>
+                                <div class="text-xl font-bold text-pink-600">${totalFemale.toLocaleString()} คน</div>
+                            </div>
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">ความหนาแน่นเฉลี่ย</div>
+                                <div class="text-xl font-bold text-purple-600">${avgDensity.toFixed(0)} คน/ตร.กม.</div>
+                            </div>
                         </div>
-                        
-                        <div class="stat-card">
-                            <div class="w-12 h-12 icon-gradient-green rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3z"/>
-                                </svg>
-                            </div>
-                            <div class="text-2xl font-bold text-gray-900 mb-2">${population.reduce((sum, p) => sum + parseInt(p.total), 0).toLocaleString()}</div>
-                            <div class="text-sm text-gray-600 font-medium">ประชากรรวม</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="w-12 h-12 icon-gradient-purple rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
-                                </svg>
-                            </div>
-                            <div class="text-2xl font-bold text-gray-900 mb-2">${Math.round(population.reduce((sum, p) => sum + parseFloat(p.density), 0) / population.length).toLocaleString()}</div>
-                            <div class="text-sm text-gray-600 font-medium">ความหนาแน่นเฉลี่ย</div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="w-12 h-12 icon-gradient-orange rounded-xl mx-auto mb-4 flex items-center justify-center">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M3 6a3 3 0 013-3h10a1 1 0 01.8 1.6L14.25 8l2.55 3.4A1 1 0 0116 13H6a1 1 0 00-1 1v3a1 1 0 11-2 0V6z"/>
-                                </svg>
-                            </div>
-                            <div class="text-2xl font-bold text-gray-900 mb-2">${population.length > 0 ? Math.round((population.reduce((sum, p) => sum + parseInt(p.male), 0) / population.reduce((sum, p) => sum + parseInt(p.total), 0)) * 100) : 0}%</div>
-                            <div class="text-sm text-gray-600 font-medium">สัดส่วนชาย</div>
+                        <div class="mt-3 text-sm text-gray-600">
+                            <p>• มีข้อมูลประชากรทั้งหมด <strong class="text-blue-600">${population.length}</strong> เขต</p>
+                            <p>• สัดส่วนชาย:หญิง = <strong class="text-green-600">${((totalMale/totalPopulation)*100).toFixed(1)}%</strong> : <strong class="text-pink-600">${((totalFemale/totalPopulation)*100).toFixed(1)}%</strong></p>
                         </div>
                     </div>
                 ` : ''}
@@ -3953,8 +4169,8 @@
             
             if (pop) {
                 document.getElementById('populationDistrict').value = pop.district;
-                document.getElementById('populationMale').value = pop.male;
-                document.getElementById('populationFemale').value = pop.female;
+                document.getElementById('populationMale').value = pop.malePopulation;
+                document.getElementById('populationFemale').value = pop.femalePopulation;
                 document.getElementById('populationDensity').value = pop.density;
                 calculateTotal();
             }
@@ -4009,10 +4225,10 @@
                 
                 const newPopulation = {
                     district,
-                    male: male.toString(),
-                    female: female.toString(),
-                    total: total.toString(),
-                    density: density.toString()
+                    malePopulation: male,
+                    femalePopulation: female,
+                    totalPopulation: total,
+                    density: density
                 };
                 
                 if (editIndex !== null) {
@@ -4057,7 +4273,8 @@
                 return;
             }
             
-            const confirmed = confirm(`คุณต้องการลบข้อมูลประชากรนี้ใช่หรือไม่?\n\nเขต: ${pop.district}\nประชากรรวม: ${parseInt(pop.total).toLocaleString()} คน\nความหนาแน่น: ${parseFloat(pop.density).toLocaleString()} คน/ตร.กม.\n\nการดำเนินการนี้ไม่สามารถยกเลิกได้`);
+            const totalPop = pop.totalPopulation || (pop.malePopulation + pop.femalePopulation);
+            const confirmed = confirm(`คุณต้องการลบข้อมูลประชากรนี้ใช่หรือไม่?\n\nเขต: ${pop.district}\nประชากรรวม: ${totalPop.toLocaleString()} คน\nความหนาแน่น: ${parseFloat(pop.density).toLocaleString()} คน/ตร.กม.\n\nการดำเนินการนี้ไม่สามารถยกเลิกได้`);
             
             if (confirmed) {
                 try {
@@ -5315,6 +5532,637 @@
                 }
             }
         }
+
+        // Excel Import Functions
+        function showImportExcelModal(dataType = 'diseases') {
+            const isResponsible = dataType === 'responsible';
+            const isPopulation = dataType === 'population';
+            
+            let title, icon;
+            if (isResponsible) {
+                title = 'นำเข้าข้อมูลผู้รับผิดชอบจากไฟล์ Excel';
+                icon = '👥';
+            } else if (isPopulation) {
+                title = 'นำเข้าข้อมูลประชากรจากไฟล์ Excel';
+                icon = '🏙️';
+            } else {
+                title = 'นำเข้าข้อมูลโรคจากไฟล์ Excel';
+                icon = '📊';
+            }
+            
+            // Create modal overlay
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modalOverlay.id = 'importExcelModal';
+            
+            modalOverlay.innerHTML = `
+                <div class="glass-card p-8 max-w-2xl w-full mx-4 animate-slideInFromTop max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 bg-clip-text text-transparent">
+                            ${icon} ${title}
+                        </h3>
+                        <button onclick="closeImportExcelModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <!-- Import Instructions -->
+                    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <h4 class="font-bold text-blue-800 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"/>
+                            </svg>
+                            รูปแบบไฟล์ Excel ที่ต้องการ
+                        </h4>
+                        <div class="text-sm text-blue-700 space-y-2">
+                            ${isResponsible ? `
+                                <p>• <strong>คอลัมน์ A:</strong> รหัสโรค (เช่น A00, B01, C02)</p>
+                                <p>• <strong>คอลัมน์ B:</strong> ชื่อผู้รับผิดชอบ (เช่น นายสมชาย ใจดี)</p>
+                                <p>• <strong>คอลัมน์ C:</strong> ตำแหน่งผู้รับผิดชอบ (เช่น นักวิชาการสาธารณสุข)</p>
+                                <p>• <strong>คอลัมน์ D:</strong> ชื่อผู้ตรวจทาน (เช่น นายสมศักดิ์ รู้ดี)</p>
+                                <p>• <strong>คอลัมน์ E:</strong> ตำแหน่งผู้ตรวจทาน (เช่น หัวหน้ากลุ่มงาน)</p>
+                                <p>• <strong>รหัสโรค:</strong> ต้องมีอยู่ในระบบแล้ว (ต้องเพิ่มโรคก่อน)</p>
+                            ` : isPopulation ? `
+                                <p>• <strong>คอลัมน์ A:</strong> ชื่อเขต (เช่น บางรัก, วัฒนา, ปทุมวัน)</p>
+                                <p>• <strong>คอลัมน์ B:</strong> จำนวนประชากรชาย (เช่น 25000, 30000)</p>
+                                <p>• <strong>คอลัมน์ C:</strong> จำนวนประชากรหญิง (เช่น 27000, 32000)</p>
+                                <p>• <strong>คอลัมน์ D:</strong> ความหนาแน่นประชากร (คน/ตร.กม.) (เช่น 8500.5)</p>
+                                <p>• <strong>ชื่อเขต:</strong> ต้องไม่ซ้ำกันและไม่เป็นค่าว่าง</p>
+                                <p>• <strong>ตัวเลข:</strong> ต้องเป็นตัวเลขบวกเท่านั้น</p>
+                            ` : `
+                                <p>• <strong>คอลัมน์ A:</strong> รหัสโรค (เช่น A00, B01, C02)</p>
+                                <p>• <strong>คอลัมน์ B:</strong> ชื่อโรค (เช่น อหิวาตกโรค, โรคไข้หวัดใหญ่)</p>
+                                <p>• <strong>รหัสโรค:</strong> ต้องไม่ซ้ำกันและไม่เป็นค่าว่าง</p>
+                            `}
+                            <p>• <strong>แถวแรก:</strong> สามารถเป็นหัวตารางหรือข้อมูลได้</p>
+                        </div>
+                    </div>
+                    
+                    <!-- File Upload -->
+                    <div class="mb-6">
+                        <label for="excelFileInput" class="block text-sm font-medium text-gray-700 mb-2">
+                            เลือกไฟล์ Excel (.xlsx, .xls)
+                        </label>
+                        <div class="relative">
+                            <input type="file" id="excelFileInput" accept=".xlsx,.xls" 
+                                class="hidden" onchange="handleFileSelect(event, '${dataType}')">
+                            <div id="fileDropZone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-green-400 transition-colors"
+                                onclick="document.getElementById('excelFileInput').click()">
+                                <svg class="w-12 h-12 mx-auto mb-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21l3-3m-3 3l3 3m-3-3h8m13 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <p class="text-gray-600 font-medium mb-2">คลิกเพื่อเลือกไฟล์ Excel</p>
+                                <p class="text-gray-400 text-sm">หรือลากไฟล์มาวางที่นี่</p>
+                                <p class="text-gray-400 text-xs mt-2">รองรับไฟล์ .xlsx และ .xls</p>
+                            </div>
+                        </div>
+                        <div id="selectedFileName" class="mt-2 text-sm text-green-600 font-medium hidden"></div>
+                    </div>
+                    
+                    <!-- Options -->
+                    <div class="mb-6 space-y-4">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="skipFirstRow" checked class="mr-2 text-green-600 focus:ring-green-500">
+                            <span class="text-sm text-gray-700">ข้ามแถวแรก (ถ้าเป็นหัวตาราง)</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="checkbox" id="replaceExisting" class="mr-2 text-green-600 focus:ring-green-500">
+                            <span class="text-sm text-gray-700">แทนที่ข้อมูลที่มีอยู่ทั้งหมด (จะลบข้อมูลเดิมทั้งหมด)</span>
+                        </label>
+                    </div>
+                    
+                    <!-- Preview Area -->
+                    <div id="previewArea" class="mb-6 hidden">
+                        <h4 class="font-bold text-gray-700 mb-3">ตัวอย่างข้อมูลที่จะนำเข้า (5 แถวแรก)</h4>
+                        <div id="previewTable" class="overflow-x-auto border rounded-lg"></div>
+                        <div id="previewSummary" class="mt-3 text-sm text-gray-600"></div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex space-x-4">
+                        <button id="importButton" onclick="processExcelImport('${dataType}')" 
+                            class="flex-1 btn-primary disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                            </svg>
+                            นำเข้าข้อมูล
+                        </button>
+                        <button onclick="closeImportExcelModal()" class="flex-1 btn-secondary">
+                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                            </svg>
+                            ยกเลิก
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modalOverlay);
+            setupFileDropZone(dataType);
+        }
+
+        // Setup drag and drop for file
+        function setupFileDropZone(dataType = 'diseases') {
+            const dropZone = document.getElementById('fileDropZone');
+            const fileInput = document.getElementById('excelFileInput');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            dropZone.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight(e) {
+                dropZone.classList.add('border-green-400', 'bg-green-50');
+            }
+            
+            function unhighlight(e) {
+                dropZone.classList.remove('border-green-400', 'bg-green-50');
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    handleFileSelect({ target: { files: files } }, dataType);
+                }
+            }
+        }
+
+        // Handle file selection
+        let selectedFileData = null;
+        let currentDataType = 'diseases';
+        
+        function handleFileSelect(event, dataType = 'diseases') {
+            currentDataType = dataType;
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file type
+            const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                               'application/vnd.ms-excel'];
+            if (!validTypes.includes(file.type) && !file.name.match(/\\.(xlsx|xls)$/i)) {
+                showNotification('กรุณาเลือกไฟล์ Excel (.xlsx หรือ .xls) เท่านั้น', 'error');
+                return;
+            }
+            
+            // Show file name
+            const fileNameDiv = document.getElementById('selectedFileName');
+            fileNameDiv.textContent = `ไฟล์ที่เลือก: ${file.name}`;
+            fileNameDiv.classList.remove('hidden');
+            
+            // Read and parse Excel file
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1, defval: ''});
+                    
+                    selectedFileData = jsonData;
+                    showPreview(jsonData, dataType);
+                    document.getElementById('importButton').disabled = false;
+                    
+                } catch (error) {
+                    console.error('Error reading Excel file:', error);
+                    showNotification('เกิดข้อผิดพลาดในการอ่านไฟล์ Excel', 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Show preview of Excel data
+        function showPreview(data, dataType = 'diseases') {
+            const skipFirstRow = document.getElementById('skipFirstRow').checked;
+            const startRow = skipFirstRow ? 1 : 0;
+            const previewData = data.slice(startRow, startRow + 5);
+            
+            if (previewData.length === 0) {
+                showNotification('ไม่พบข้อมูลในไฟล์ Excel', 'error');
+                return;
+            }
+            
+            const isResponsible = dataType === 'responsible';
+            const isPopulation = dataType === 'population';
+            const previewTable = document.getElementById('previewTable');
+            
+            if (isPopulation) {
+                previewTable.innerHTML = `
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ชื่อเขต</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ประชากรชาย</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ประชากรหญิง</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ความหนาแน่น</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${previewData.map(row => `
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[0] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[1] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[2] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[3] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if (isResponsible) {
+                previewTable.innerHTML = `
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">รหัสโรค</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ผู้รับผิดชอบ</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ตำแหน่ง</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ผู้ตรวจทาน</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ตำแหน่งผู้ตรวจทาน</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${previewData.map(row => `
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[0] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[1] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[2] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[3] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[4] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else {
+                previewTable.innerHTML = `
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">รหัสโรค</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ชื่อโรค</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${previewData.map(row => `
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[0] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[1] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            // Show summary
+            const totalRows = data.length - (skipFirstRow ? 1 : 0);
+            let validRows;
+            
+            if (isPopulation) {
+                validRows = data.slice(startRow).filter(row => 
+                    row[0] && row[0].toString().trim() && // ชื่อเขต
+                    row[1] && !isNaN(Number(row[1])) && Number(row[1]) >= 0 && // ประชากรชาย
+                    row[2] && !isNaN(Number(row[2])) && Number(row[2]) >= 0 && // ประชากรหญิง
+                    row[3] && !isNaN(Number(row[3])) && Number(row[3]) >= 0    // ความหนาแน่น
+                ).length;
+            } else if (isResponsible) {
+                validRows = data.slice(startRow).filter(row => 
+                    row[0] && row[0].toString().trim() && // รหัสโรค
+                    row[1] && row[1].toString().trim() && // ผู้รับผิดชอบ
+                    row[2] && row[2].toString().trim() && // ตำแหน่งผู้รับผิดชอบ
+                    row[3] && row[3].toString().trim() && // ผู้ตรวจทาน
+                    row[4] && row[4].toString().trim()    // ตำแหน่งผู้ตรวจทาน
+                ).length;
+            } else {
+                validRows = data.slice(startRow).filter(row => 
+                    row[0] && row[0].toString().trim() && 
+                    row[1] && row[1].toString().trim()
+                ).length;
+            }
+            
+            document.getElementById('previewSummary').innerHTML = `
+                จำนวนแถวทั้งหมด: <strong>${totalRows}</strong> แถว | 
+                แถวที่มีข้อมูลครบ: <strong>${validRows}</strong> แถว
+            `;
+            
+            document.getElementById('previewArea').classList.remove('hidden');
+        }
+
+        // Process Excel import
+        async function processExcelImport(dataType = 'diseases') {
+            if (!selectedFileData) {
+                showNotification('กรุณาเลือกไฟล์ Excel ก่อน', 'error');
+                return;
+            }
+            
+            const importButton = document.getElementById('importButton');
+            const originalText = importButton.innerHTML;
+            importButton.innerHTML = `
+                <svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                กำลังนำเข้า...
+            `;
+            importButton.disabled = true;
+            
+            try {
+                const skipFirstRow = document.getElementById('skipFirstRow').checked;
+                const replaceExisting = document.getElementById('replaceExisting').checked;
+                const startRow = skipFirstRow ? 1 : 0;
+                
+                if (dataType === 'population') {
+                    await processPopulationImport(startRow, replaceExisting);
+                } else if (dataType === 'responsible') {
+                    await processResponsibleImport(startRow, replaceExisting);
+                } else {
+                    await processDiseaseImport(startRow, replaceExisting);
+                }
+                
+                // Close modal and refresh table
+                closeImportExcelModal();
+                if (dataType === 'population') {
+                    await loadPopulationTable();
+                } else if (dataType === 'responsible') {
+                    await loadResponsibleTable();
+                } else {
+                    await loadDiseasesTable();
+                }
+                
+            } catch (error) {
+                console.error('Error importing Excel data:', error);
+                showNotification('เกิดข้อผิดพลาดในการนำเข้าข้อมูล', 'error');
+                importButton.innerHTML = originalText;
+                importButton.disabled = false;
+            }
+        }
+
+        // Process disease import
+        async function processDiseaseImport(startRow, replaceExisting) {
+            const processedData = [];
+            const errors = [];
+            const duplicateCodes = new Set();
+            
+            for (let i = startRow; i < selectedFileData.length; i++) {
+                const row = selectedFileData[i];
+                const code = row[0] ? row[0].toString().trim() : '';
+                const name = row[1] ? row[1].toString().trim() : '';
+                
+                if (!code || !name) {
+                    if (code || name) {
+                        errors.push(`แถว ${i + 1}: ข้อมูลไม่ครบถ้วน (รหัส: "${code}", ชื่อ: "${name}")`);
+                    }
+                    continue;
+                }
+                
+                if (duplicateCodes.has(code)) {
+                    errors.push(`แถว ${i + 1}: รหัสโรค "${code}" ซ้ำในไฟล์`);
+                    continue;
+                }
+                
+                duplicateCodes.add(code);
+                processedData.push({ code, name });
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่พบข้อมูลที่ถูกต้องในไฟล์');
+            }
+            
+            let existingDiseases = await loadFromFirebase('diseases');
+            if (!replaceExisting) {
+                const existingCodes = new Set(existingDiseases.map(d => d.code));
+                const duplicateExisting = processedData.filter(d => existingCodes.has(d.code));
+                
+                if (duplicateExisting.length > 0) {
+                    errors.push(`รหัสโรคที่มีอยู่แล้ว: ${duplicateExisting.map(d => d.code).join(', ')}`);
+                }
+                
+                const newData = processedData.filter(d => !existingCodes.has(d.code));
+                processedData.length = 0;
+                processedData.push(...newData);
+            }
+            
+            if (errors.length > 0) {
+                const errorMsg = `พบข้อผิดพลาด ${errors.length} รายการ:\\n${errors.slice(0, 5).join('\\n')}${errors.length > 5 ? '\\n...' : ''}`;
+                if (!confirm(`${errorMsg}\\n\\nต้องการดำเนินการต่อกับข้อมูลที่ถูกต้องหรือไม่?`)) {
+                    throw new Error('ยกเลิกการนำเข้าโดยผู้ใช้');
+                }
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่มีข้อมูลใหม่ที่จะนำเข้า');
+            }
+            
+            const finalData = replaceExisting ? processedData : [...existingDiseases, ...processedData];
+            await saveToFirebase('diseases', finalData);
+            
+            const message = replaceExisting 
+                ? `แทนที่ข้อมูลสำเร็จ! นำเข้า ${processedData.length} รายการ`
+                : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
+            
+            showNotification(message, 'success');
+        }
+
+        // Process responsible import
+        async function processResponsibleImport(startRow, replaceExisting) {
+            const processedData = [];
+            const errors = [];
+            const duplicateCodes = new Set();
+            
+            // Get existing diseases for validation
+            const existingDiseases = await loadFromFirebase('diseases');
+            const diseaseCodeSet = new Set(existingDiseases.map(d => d.code));
+            
+            for (let i = startRow; i < selectedFileData.length; i++) {
+                const row = selectedFileData[i];
+                const diseaseCode = row[0] ? row[0].toString().trim() : '';
+                const responsibleName = row[1] ? row[1].toString().trim() : '';
+                const responsiblePosition = row[2] ? row[2].toString().trim() : '';
+                const reviewerName = row[3] ? row[3].toString().trim() : '';
+                const reviewerPosition = row[4] ? row[4].toString().trim() : '';
+                
+                if (!diseaseCode || !responsibleName || !responsiblePosition || !reviewerName || !reviewerPosition) {
+                    if (diseaseCode || responsibleName || responsiblePosition || reviewerName || reviewerPosition) {
+                        errors.push(`แถว ${i + 1}: ข้อมูลไม่ครบถ้วน`);
+                    }
+                    continue;
+                }
+                
+                // Check if disease code exists
+                if (!diseaseCodeSet.has(diseaseCode)) {
+                    errors.push(`แถว ${i + 1}: ไม่พบรหัสโรค "${diseaseCode}" ในระบบ (ต้องเพิ่มโรคก่อน)`);
+                    continue;
+                }
+                
+                if (duplicateCodes.has(diseaseCode)) {
+                    errors.push(`แถว ${i + 1}: รหัสโรค "${diseaseCode}" ซ้ำในไฟล์`);
+                    continue;
+                }
+                
+                duplicateCodes.add(diseaseCode);
+                processedData.push({
+                    diseaseCode,
+                    responsibleName,
+                    responsiblePosition,
+                    reviewerName,
+                    reviewerPosition
+                });
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่พบข้อมูลที่ถูกต้องในไฟล์');
+            }
+            
+            let existingResponsible = await loadFromFirebase('responsible');
+            if (!replaceExisting) {
+                const existingCodes = new Set(existingResponsible.map(r => r.diseaseCode));
+                const duplicateExisting = processedData.filter(r => existingCodes.has(r.diseaseCode));
+                
+                if (duplicateExisting.length > 0) {
+                    errors.push(`รหัสโรคที่มีผู้รับผิดชอบแล้ว: ${duplicateExisting.map(r => r.diseaseCode).join(', ')}`);
+                }
+                
+                const newData = processedData.filter(r => !existingCodes.has(r.diseaseCode));
+                processedData.length = 0;
+                processedData.push(...newData);
+            }
+            
+            if (errors.length > 0) {
+                const errorMsg = `พบข้อผิดพลาด ${errors.length} รายการ:\\n${errors.slice(0, 5).join('\\n')}${errors.length > 5 ? '\\n...' : ''}`;
+                if (!confirm(`${errorMsg}\\n\\nต้องการดำเนินการต่อกับข้อมูลที่ถูกต้องหรือไม่?`)) {
+                    throw new Error('ยกเลิกการนำเข้าโดยผู้ใช้');
+                }
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่มีข้อมูลใหม่ที่จะนำเข้า');
+            }
+            
+            const finalData = replaceExisting ? processedData : [...existingResponsible, ...processedData];
+            await saveToFirebase('responsible', finalData);
+            
+            const message = replaceExisting 
+                ? `แทนที่ข้อมูลสำเร็จ! นำเข้า ${processedData.length} รายการ`
+                : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
+            
+            showNotification(message, 'success');
+        }
+
+        // Process population import
+        async function processPopulationImport(startRow, replaceExisting) {
+            const processedData = [];
+            const errors = [];
+            const duplicateDistricts = new Set();
+            
+            for (let i = startRow; i < selectedFileData.length; i++) {
+                const row = selectedFileData[i];
+                const districtName = row[0] ? row[0].toString().trim() : '';
+                const malePopulation = row[1] ? Number(row[1]) : NaN;
+                const femalePopulation = row[2] ? Number(row[2]) : NaN;
+                const density = row[3] ? Number(row[3]) : NaN;
+                
+                if (!districtName || isNaN(malePopulation) || isNaN(femalePopulation) || isNaN(density)) {
+                    if (districtName || !isNaN(malePopulation) || !isNaN(femalePopulation) || !isNaN(density)) {
+                        errors.push(`แถว ${i + 1}: ข้อมูลไม่ครบถ้วนหรือตัวเลขไม่ถูกต้อง`);
+                    }
+                    continue;
+                }
+                
+                // Validate positive numbers
+                if (malePopulation < 0 || femalePopulation < 0 || density < 0) {
+                    errors.push(`แถว ${i + 1}: ตัวเลขต้องเป็นค่าบวกเท่านั้น`);
+                    continue;
+                }
+                
+                if (duplicateDistricts.has(districtName)) {
+                    errors.push(`แถว ${i + 1}: ชื่อเขต "${districtName}" ซ้ำในไฟล์`);
+                    continue;
+                }
+                
+                duplicateDistricts.add(districtName);
+                processedData.push({
+                    district: districtName,
+                    malePopulation: malePopulation,
+                    femalePopulation: femalePopulation,
+                    density: density,
+                    totalPopulation: malePopulation + femalePopulation
+                });
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่พบข้อมูลที่ถูกต้องในไฟล์');
+            }
+            
+            let existingPopulation = await loadFromFirebase('population');
+            if (!replaceExisting) {
+                const existingDistricts = new Set(existingPopulation.map(p => p.district));
+                const duplicateExisting = processedData.filter(p => existingDistricts.has(p.district));
+                
+                if (duplicateExisting.length > 0) {
+                    errors.push(`เขตที่มีข้อมูลแล้ว: ${duplicateExisting.map(p => p.district).join(', ')}`);
+                }
+                
+                const newData = processedData.filter(p => !existingDistricts.has(p.district));
+                processedData.length = 0;
+                processedData.push(...newData);
+            }
+            
+            if (errors.length > 0) {
+                const errorMsg = `พบข้อผิดพลาด ${errors.length} รายการ:\\n${errors.slice(0, 5).join('\\n')}${errors.length > 5 ? '\\n...' : ''}`;
+                if (!confirm(`${errorMsg}\\n\\nต้องการดำเนินการต่อกับข้อมูลที่ถูกต้องหรือไม่?`)) {
+                    throw new Error('ยกเลิกการนำเข้าโดยผู้ใช้');
+                }
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่มีข้อมูลใหม่ที่จะนำเข้า');
+            }
+            
+            const finalData = replaceExisting ? processedData : [...existingPopulation, ...processedData];
+            await saveToFirebase('population', finalData);
+            
+            const message = replaceExisting 
+                ? `แทนที่ข้อมูลสำเร็จ! นำเข้า ${processedData.length} รายการ`
+                : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
+            
+            showNotification(message, 'success');
+        }
+
+        // Close import modal
+        function closeImportExcelModal() {
+            const modal = document.getElementById('importExcelModal');
+            if (modal) {
+                modal.remove();
+            }
+            selectedFileData = null;
+            currentDataType = 'diseases';
+        }
+
+        // Update preview when options change
+        document.addEventListener('change', function(e) {
+            if (e.target && e.target.id === 'skipFirstRow' && selectedFileData) {
+                showPreview(selectedFileData, currentDataType);
+            }
+        });
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
