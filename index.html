@@ -5626,6 +5626,14 @@
                                 <p>• <strong>รหัสโรค:</strong> ใช้รหัสมาตรฐาน ICD-10 หรือรหัสที่กำหนดเอง</p>
                                 <p>• <strong>ชื่อโรค:</strong> ชื่อเต็มของโรคภาษาไทย</p>
                             </div>
+                            <div class="mt-4 flex justify-center">
+                                <button onclick="downloadDiseaseExampleFile()" class="btn-secondary text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                    </svg>
+                                    ดาวน์โหลดไฟล์ตัวอย่าง Excel
+                                </button>
+                            </div>
                         </div>
                         ` : ''}
                     </div>
@@ -6170,6 +6178,59 @@
                 : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
             
             showNotification(message, 'success');
+        }
+
+        // Download example Excel file for diseases
+        function downloadDiseaseExampleFile() {
+            // Create sample data
+            const sampleData = [
+                ['รหัสโรค', 'ชื่อโรค'],
+                ['A00', 'อหิวาตกโรค'],
+                ['B01', 'โรคไข้หวัดใหญ่'],
+                ['C02', 'โรคติดเชื้อทางเดินหายใจ'],
+                ['D03', 'โรคท้องเสีย'],
+                ['E04', 'โรคเบาหวาน'],
+                ['F05', 'โรคความดันโลหิตสูง'],
+                ['G06', 'โรคหัวใจ'],
+                ['H07', 'โรคไตวาย'],
+                ['I08', 'โรคมะเร็ง'],
+                ['J09', 'โรคซึมเศร้า']
+            ];
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sampleData);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 12 },  // รหัสโรค column width
+                { wch: 35 }   // ชื่อโรค column width
+            ];
+
+            // Style the header row
+            const headerStyle = {
+                font: { bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "FFE082" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            // Apply header styling
+            if (ws['A1']) ws['A1'].s = headerStyle;
+            if (ws['B1']) ws['B1'].s = headerStyle;
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'รายการโรค');
+
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
+            const filename = `ตัวอย่าง_รหัสโรคและชื่อโรค_${dateStr}.xlsx`;
+
+            // Download the file
+            XLSX.writeFile(wb, filename);
+
+            // Show notification
+            showNotification('ดาวน์โหลดไฟล์ตัวอย่างเรียบร้อยแล้ว!', 'success');
         }
 
         // Close import modal
