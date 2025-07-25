@@ -2408,8 +2408,8 @@
                 existingImportBtn.remove();
             }
             
-            // Add import button for diseases, responsible, and population
-            if (type === 'diseases' || type === 'responsible' || type === 'population') {
+            // Add import button for diseases, responsible, population, and agePopulation
+            if (type === 'diseases' || type === 'responsible' || type === 'population' || type === 'agePopulation') {
                 const importButton = document.createElement('button');
                 importButton.id = 'importExcelButton';
                 importButton.className = 'btn-secondary';
@@ -5515,6 +5515,7 @@
         function showImportExcelModal(dataType = 'diseases') {
             const isResponsible = dataType === 'responsible';
             const isPopulation = dataType === 'population';
+            const isAgePopulation = dataType === 'agePopulation';
             
             let title, icon;
             if (isResponsible) {
@@ -5523,6 +5524,9 @@
             } else if (isPopulation) {
                 title = 'นำเข้าข้อมูลประชากรจากไฟล์ Excel';
                 icon = '🏙️';
+            } else if (isAgePopulation) {
+                title = 'นำเข้าข้อมูลประชากรจำแนกตามอายุจากไฟล์ Excel';
+                icon = '👶👵';
             } else {
                 title = 'นำเข้าข้อมูลโรคจากไฟล์ Excel';
                 icon = '📊';
@@ -5566,6 +5570,13 @@
                                 <p>• <strong>คอลัมน์ A:</strong> ชื่อเขต (เช่น บางรัก, วัฒนา, ปทุมวัน)</p>
                                 <p>• <strong>คอลัมน์ B:</strong> จำนวนประชากรชาย (เช่น 25000, 30000)</p>
                                 <p>• <strong>คอลัมน์ C:</strong> จำนวนประชากรหญิง (เช่น 27000, 32000)</p>
+                                <p>• <strong>ชื่อเขต:</strong> ต้องไม่ซ้ำกันและไม่เป็นค่าว่าง</p>
+                                <p>• <strong>ตัวเลข:</strong> ต้องเป็นตัวเลขบวกเท่านั้น</p>
+                            ` : isAgePopulation ? `
+                                <p>• <strong>คอลัมน์ A:</strong> ชื่อเขต (เช่น บางรัก, วัฒนา, ปทุมวัน)</p>
+                                <p>• <strong>คอลัมน์ B:</strong> 0-14 ปี (เช่น 12000, 15000)</p>
+                                <p>• <strong>คอลัมน์ C:</strong> 15-59 ปี (เช่น 35000, 42000)</p>
+                                <p>• <strong>คอลัมน์ D:</strong> 60+ ปี (เช่น 8000, 10000)</p>
                                 <p>• <strong>ชื่อเขต:</strong> ต้องไม่ซ้ำกันและไม่เป็นค่าว่าง</p>
                                 <p>• <strong>ตัวเลข:</strong> ต้องเป็นตัวเลขบวกเท่านั้น</p>
                             ` : `
@@ -5641,6 +5652,82 @@
                             </div>
                             <div class="mt-4 flex justify-center">
                                 <button onclick="downloadPopulationExampleFile()" class="btn-secondary text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                    </svg>
+                                    ดาวน์โหลดไฟล์ตัวอย่าง Excel
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${isAgePopulation ? `
+                        <!-- Example Table for Age Population Import -->
+                        <div class="mt-4 p-4 bg-gradient-to-r from-teal-50 to-cyan-50 border border-teal-200 rounded-lg">
+                            <h5 class="font-bold text-teal-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                                ตัวอย่างข้อมูลในไฟล์ Excel
+                            </h5>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm border border-gray-300 rounded">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">A</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">B</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">C</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">D</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                        <tr class="bg-yellow-50">
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ชื่อเขต</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">0-14 ปี</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">15-59 ปี</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">60+ ปี</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">บางรัก</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">8,500</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">35,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-orange-600">8,500</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">วัฒนา</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">14,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">58,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-orange-600">15,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">ปทุมวัน</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">12,500</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">52,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-orange-600">14,500</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">สาทร</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">11,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">47,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-orange-600">14,000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">คลองเตย</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">18,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-purple-600">71,000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-orange-600">18,000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-xs text-teal-700 space-y-1">
+                                <p>• <strong>แถวสีเหลือง:</strong> หัวตาราง (สามารถข้ามได้โดยเลือก "ข้ามแถวแรก")</p>
+                                <p>• <strong>ช่วงอายุ:</strong> 0-14 ปี (เด็ก), 15-59 ปี (วัยทำงาน), 60+ ปี (ผู้สูงอายุ)</p>
+                                <p>• <strong>ตัวเลขประชากร:</strong> ใส่เฉพาะตัวเลขบวก ไม่ต้องใส่เครื่องหมายจุลภาค</p>
+                                <p>• <strong>ประชากรรวม:</strong> ระบบจะคำนวณอัตโนมัติจากผลรวมทุกช่วงอายุ</p>
+                            </div>
+                            <div class="mt-4 flex justify-center">
+                                <button onclick="downloadAgePopulationExampleFile()" class="btn-secondary text-sm flex items-center">
                                     <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
                                     </svg>
@@ -5943,9 +6030,33 @@
             
             const isResponsible = dataType === 'responsible';
             const isPopulation = dataType === 'population';
+            const isAgePopulation = dataType === 'agePopulation';
             const previewTable = document.getElementById('previewTable');
             
-            if (isPopulation) {
+            if (isAgePopulation) {
+                previewTable.innerHTML = `
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">ชื่อเขต</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">0-14 ปี</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">15-59 ปี</th>
+                                <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">60+ ปี</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${previewData.map(row => `
+                                <tr>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[0] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[1] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[2] || '-'}</td>
+                                    <td class="px-4 py-2 text-sm text-gray-900">${row[3] || '-'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } else if (isPopulation) {
                 previewTable.innerHTML = `
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
@@ -6016,7 +6127,14 @@
             const totalRows = data.length - (skipFirstRow ? 1 : 0);
             let validRows;
             
-            if (isPopulation) {
+            if (isAgePopulation) {
+                validRows = data.slice(startRow).filter(row => 
+                    row[0] && row[0].toString().trim() && // ชื่อเขต
+                    row[1] && !isNaN(Number(row[1])) && Number(row[1]) >= 0 && // 0-14 ปี
+                    row[2] && !isNaN(Number(row[2])) && Number(row[2]) >= 0 && // 15-59 ปี
+                    row[3] && !isNaN(Number(row[3])) && Number(row[3]) >= 0    // 60+ ปี
+                ).length;
+            } else if (isPopulation) {
                 validRows = data.slice(startRow).filter(row => 
                     row[0] && row[0].toString().trim() && // ชื่อเขต
                     row[1] && !isNaN(Number(row[1])) && Number(row[1]) >= 0 && // ประชากรชาย
@@ -6068,7 +6186,9 @@
                 const replaceExisting = document.getElementById('replaceExisting').checked;
                 const startRow = skipFirstRow ? 1 : 0;
                 
-                if (dataType === 'population') {
+                if (dataType === 'agePopulation') {
+                    await processAgePopulationImport(startRow, replaceExisting);
+                } else if (dataType === 'population') {
                     await processPopulationImport(startRow, replaceExisting);
                 } else if (dataType === 'responsible') {
                     await processResponsibleImport(startRow, replaceExisting);
@@ -6078,7 +6198,9 @@
                 
                 // Close modal and refresh table
                 closeImportExcelModal();
-                if (dataType === 'population') {
+                if (dataType === 'agePopulation') {
+                    await loadAgePopulationTable();
+                } else if (dataType === 'population') {
                     await loadPopulationTable();
                 } else if (dataType === 'responsible') {
                     await loadResponsibleTable();
@@ -6323,6 +6445,103 @@
             showNotification(message, 'success');
         }
 
+        // Process age population import
+        async function processAgePopulationImport(startRow, replaceExisting) {
+            const processedData = [];
+            const errors = [];
+            const duplicateDistricts = new Set();
+            
+            for (let i = startRow; i < selectedFileData.length; i++) {
+                const row = selectedFileData[i];
+                const district = row[0] ? row[0].toString().trim() : '';
+                const ageGroup0_14 = row[1];
+                const ageGroup15_59 = row[2];
+                const ageGroup60Plus = row[3];
+                
+                if (!district) {
+                    if (ageGroup0_14 || ageGroup15_59 || ageGroup60Plus) {
+                        errors.push(`แถว ${i + 1}: ไม่มีชื่อเขต`);
+                    }
+                    continue;
+                }
+                
+                // Validate numbers
+                if (!ageGroup0_14 || isNaN(Number(ageGroup0_14)) || Number(ageGroup0_14) < 0) {
+                    errors.push(`แถว ${i + 1}: ประชากร 0-14 ปี ไม่ถูกต้อง`);
+                    continue;
+                }
+                
+                if (!ageGroup15_59 || isNaN(Number(ageGroup15_59)) || Number(ageGroup15_59) < 0) {
+                    errors.push(`แถว ${i + 1}: ประชากร 15-59 ปี ไม่ถูกต้อง`);
+                    continue;
+                }
+                
+                if (!ageGroup60Plus || isNaN(Number(ageGroup60Plus)) || Number(ageGroup60Plus) < 0) {
+                    errors.push(`แถว ${i + 1}: ประชากร 60+ ปี ไม่ถูกต้อง`);
+                    continue;
+                }
+                
+                if (duplicateDistricts.has(district)) {
+                    errors.push(`แถว ${i + 1}: เขต "${district}" ซ้ำในไฟล์`);
+                    continue;
+                }
+                
+                duplicateDistricts.add(district);
+                
+                const popAge0_14 = Number(ageGroup0_14);
+                const popAge15_59 = Number(ageGroup15_59);
+                const popAge60Plus = Number(ageGroup60Plus);
+                const totalPopulation = popAge0_14 + popAge15_59 + popAge60Plus;
+                
+                processedData.push({
+                    district,
+                    ageGroup0_14: popAge0_14,
+                    ageGroup15_59: popAge15_59,
+                    ageGroup60Plus: popAge60Plus,
+                    totalPopulation,
+                    year: new Date().getFullYear()
+                });
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่พบข้อมูลที่ถูกต้องในไฟล์');
+            }
+            
+            let existingAgePopulation = await loadFromFirebase('agePopulation') || [];
+            if (!replaceExisting) {
+                const existingDistricts = new Set(existingAgePopulation.map(p => p.district));
+                const duplicateExisting = processedData.filter(p => existingDistricts.has(p.district));
+                
+                if (duplicateExisting.length > 0) {
+                    errors.push(`เขตที่มีข้อมูลแล้ว: ${duplicateExisting.map(p => p.district).join(', ')}`);
+                }
+                
+                const newData = processedData.filter(p => !existingDistricts.has(p.district));
+                processedData.length = 0;
+                processedData.push(...newData);
+            }
+            
+            if (errors.length > 0) {
+                const errorMsg = `พบข้อผิดพลาด ${errors.length} รายการ:\n${errors.slice(0, 5).join('\n')}${errors.length > 5 ? '\n...' : ''}`;
+                if (!confirm(`${errorMsg}\n\nต้องการดำเนินการต่อกับข้อมูลที่ถูกต้องหรือไม่?`)) {
+                    throw new Error('ยกเลิกการนำเข้าโดยผู้ใช้');
+                }
+            }
+            
+            if (processedData.length === 0) {
+                throw new Error('ไม่มีข้อมูลใหม่ที่จะนำเข้า');
+            }
+            
+            const finalData = replaceExisting ? processedData : [...existingAgePopulation, ...processedData];
+            await saveToFirebase('agePopulation', finalData);
+            
+            const message = replaceExisting 
+                ? `แทนที่ข้อมูลสำเร็จ! นำเข้า ${processedData.length} รายการ`
+                : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
+            
+            showNotification(message, 'success');
+        }
+
         // Download example Excel file for population
         function downloadPopulationExampleFile() {
             // Create sample data
@@ -6396,6 +6615,78 @@
 
             // Show notification
             showNotification('ดาวน์โหลดไฟล์ตัวอย่างเรียบร้อยแล้ว!', 'success');
+        }
+
+        // Download example Excel file for age population
+        function downloadAgePopulationExampleFile() {
+            // Create sample data
+            const sampleData = [
+                ['ชื่อเขต', '0-14 ปี', '15-59 ปี', '60+ ปี'],
+                ['บางรัก', 8500, 35000, 8500],
+                ['วัฒนา', 14000, 58000, 15000],
+                ['ปทุมวัน', 12500, 52000, 14500],
+                ['สาทร', 11000, 47000, 14000],
+                ['คลองเตย', 18000, 71000, 18000],
+                ['บางคอแหลม', 16500, 65000, 17500],
+                ['ยานนาวา', 15000, 60000, 16000],
+                ['บางนา', 30000, 120000, 31000],
+                ['พระโขนง', 25000, 102000, 26000],
+                ['วังทองหลาง', 21000, 85000, 21000],
+                ['หนองจอก', 32000, 128000, 33000],
+                ['มีนบุรี', 29000, 118000, 32000],
+                ['ลาดกระบัง', 26000, 107000, 27000],
+                ['บางขุนเทียน', 42000, 170000, 43000],
+                ['ทุ่งครุ', 23000, 92000, 24000]
+            ];
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sampleData);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 18 },  // ชื่อเขต
+                { wch: 12 },  // 0-14 ปี
+                { wch: 12 },  // 15-59 ปี
+                { wch: 12 }   // 60+ ปี
+            ];
+
+            // Style the header row
+            const headerStyle = {
+                font: { bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "4ECCA3" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            // Apply header styling
+            ['A1', 'B1', 'C1', 'D1'].forEach(cell => {
+                if (ws[cell]) ws[cell].s = headerStyle;
+            });
+
+            // Add number formatting for population columns
+            const numberStyle = {
+                numFmt: "#,##0"
+            };
+
+            // Apply number formatting to all data cells (B2:D16)
+            for (let row = 2; row <= 16; row++) {
+                ['B', 'C', 'D'].forEach(col => {
+                    const cellRef = col + row;
+                    if (ws[cellRef]) ws[cellRef].s = numberStyle;
+                });
+            }
+
+            XLSX.utils.book_append_sheet(wb, ws, "ข้อมูลประชากรตามอายุ");
+
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = now.toISOString().slice(0, 10);
+            const filename = `ตัวอย่าง_ประชากรจำแนกตามอายุ_${dateStr}.xlsx`;
+
+            // Download the file
+            XLSX.writeFile(wb, filename);
+            
+            showNotification('ดาวน์โหลดไฟล์ตัวอย่างสำเร็จ!', 'success');
         }
 
         // Download example Excel file for responsible persons
