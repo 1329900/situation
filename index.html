@@ -5576,6 +5576,149 @@
                             <p>• <strong>แถวแรก:</strong> สามารถเป็นหัวตารางหรือข้อมูลได้</p>
                         </div>
                         
+                        ${isPopulation ? `
+                        <!-- Example Table for Population Import -->
+                        <div class="mt-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 border border-orange-200 rounded-lg">
+                            <h5 class="font-bold text-orange-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                                ตัวอย่างข้อมูลในไฟล์ Excel
+                            </h5>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm border border-gray-300 rounded">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">A</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">B</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">C</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                        <tr class="bg-yellow-50">
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ชื่อเขต</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ประชากรชาย</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ประชากรหญิง</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">บางรัก</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">25000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-pink-600">27000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">วัฒนา</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">42000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-pink-600">45000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">ปทุมวัน</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">38000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-pink-600">41000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">สาทร</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">35000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-pink-600">37000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">คลองเตย</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">52000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-pink-600">55000</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-semibold text-blue-600">บางคอแหลม</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-green-600">48000</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-pink-600">51000</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-xs text-orange-700 space-y-1">
+                                <p>• <strong>แถวสีเหลือง:</strong> หัวตาราง (สามารถข้ามได้โดยเลือก "ข้ามแถวแรก")</p>
+                                <p>• <strong>ชื่อเขต:</strong> ใช้ชื่อเขตในกรุงเทพมหานครเท่านั้น</p>
+                                <p>• <strong>ตัวเลขประชากร:</strong> ใส่เฉพาะตัวเลขบวก ไม่ต้องใส่เครื่องหมายจุลภาค</p>
+                                <p>• <strong>ประชากรรวม:</strong> ระบบจะคำนวณอัตโนมัติจากชาย + หญิง</p>
+                            </div>
+                            <div class="mt-4 flex justify-center">
+                                <button onclick="downloadPopulationExampleFile()" class="btn-secondary text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                    </svg>
+                                    ดาวน์โหลดไฟล์ตัวอย่าง Excel
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
+                        ${isResponsible ? `
+                        <!-- Example Table for Responsible Person Import -->
+                        <div class="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 rounded-lg">
+                            <h5 class="font-bold text-purple-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                                ตัวอย่างข้อมูลในไฟล์ Excel
+                            </h5>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm border border-gray-300 rounded">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">A</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">B</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">C</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">D</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">E</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                        <tr class="bg-yellow-50">
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">รหัสโรค</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ผู้รับผิดชอบ</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ตำแหน่ง</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ผู้ตรวจทาน</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ตำแหน่งผู้ตรวจทาน</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">A00</td>
+                                            <td class="px-3 py-2 border border-gray-300">นายสมชาย ใจดี</td>
+                                            <td class="px-3 py-2 border border-gray-300">นักวิชาการสาธารณสุข</td>
+                                            <td class="px-3 py-2 border border-gray-300">นายสมศักดิ์ รู้ดี</td>
+                                            <td class="px-3 py-2 border border-gray-300">หัวหน้ากลุ่มงาน</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">B01</td>
+                                            <td class="px-3 py-2 border border-gray-300">นางสาวสุนิสา เก่งดี</td>
+                                            <td class="px-3 py-2 border border-gray-300">เจ้าหน้าที่สาธารณสุข</td>
+                                            <td class="px-3 py-2 border border-gray-300">นายสมพร ดีใจ</td>
+                                            <td class="px-3 py-2 border border-gray-300">ผู้อำนวยการ</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">C02</td>
+                                            <td class="px-3 py-2 border border-gray-300">นายอนุชา มั่นใจ</td>
+                                            <td class="px-3 py-2 border border-gray-300">แพทย์</td>
+                                            <td class="px-3 py-2 border border-gray-300">นางสาวมาลี ยิ้มแย้ม</td>
+                                            <td class="px-3 py-2 border border-gray-300">หัวหน้าแผนก</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-xs text-purple-700 space-y-1">
+                                <p>• <strong>แถวสีเหลือง:</strong> หัวตาราง (สามารถข้ามได้โดยเลือก "ข้ามแถวแรก")</p>
+                                <p>• <strong>รหัสโรค:</strong> ต้องมีในระบบแล้ว (เพิ่มโรคก่อนถึงจะเพิ่มผู้รับผิดชอบได้)</p>
+                                <p>• <strong>ชื่อบุคคล:</strong> ใส่คำนำหน้าและชื่อ-นามสกุลเต็ม</p>
+                                <p>• <strong>ตำแหน่ง:</strong> ระบุตำแหน่งงานที่ชัดเจน</p>
+                            </div>
+                            <div class="mt-4 flex justify-center">
+                                <button onclick="downloadResponsibleExampleFile()" class="btn-secondary text-sm flex items-center">
+                                    <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"/>
+                                    </svg>
+                                    ดาวน์โหลดไฟล์ตัวอย่าง Excel
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+                        
                         ${!isResponsible && !isPopulation ? `
                         <!-- Example Table for Disease Import -->
                         <div class="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
@@ -6178,6 +6321,136 @@
                 : `นำเข้าข้อมูลสำเร็จ! เพิ่มใหม่ ${processedData.length} รายการ`;
             
             showNotification(message, 'success');
+        }
+
+        // Download example Excel file for population
+        function downloadPopulationExampleFile() {
+            // Create sample data
+            const sampleData = [
+                ['ชื่อเขต', 'ประชากรชาย', 'ประชากรหญิง'],
+                ['บางรัก', 25000, 27000],
+                ['วัฒนา', 42000, 45000],
+                ['ปทุมวัน', 38000, 41000],
+                ['สาทร', 35000, 37000],
+                ['คลองเตย', 52000, 55000],
+                ['บางคอแหลม', 48000, 51000],
+                ['ยานนาวา', 44000, 47000],
+                ['บางนา', 89000, 92000],
+                ['พระโขนง', 75000, 78000],
+                ['วังทองหลาง', 62000, 65000],
+                ['หนองจอก', 95000, 98000],
+                ['มีนบุรี', 88000, 91000],
+                ['ลาดกระบัง', 78000, 82000],
+                ['บางขุนเทียน', 125000, 130000],
+                ['ทุ่งครุ', 68000, 71000]
+            ];
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sampleData);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 18 },  // ชื่อเขต
+                { wch: 15 },  // ประชากรชาย
+                { wch: 15 }   // ประชากรหญิง
+            ];
+
+            // Style the header row
+            const headerStyle = {
+                font: { bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "FFE082" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            // Apply header styling
+            ['A1', 'B1', 'C1'].forEach(cell => {
+                if (ws[cell]) ws[cell].s = headerStyle;
+            });
+
+            // Add number formatting for population columns
+            const numberStyle = {
+                numFmt: "#,##0"
+            };
+
+            // Apply number formatting to data rows
+            for (let row = 2; row <= sampleData.length; row++) {
+                ['B', 'C'].forEach(col => {
+                    const cell = col + row;
+                    if (ws[cell]) {
+                        ws[cell].s = numberStyle;
+                    }
+                });
+            }
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'ประชากรกรุงเทพ');
+
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
+            const filename = `ตัวอย่าง_ประชากรกรุงเทพมหานคร_${dateStr}.xlsx`;
+
+            // Download the file
+            XLSX.writeFile(wb, filename);
+
+            // Show notification
+            showNotification('ดาวน์โหลดไฟล์ตัวอย่างเรียบร้อยแล้ว!', 'success');
+        }
+
+        // Download example Excel file for responsible persons
+        function downloadResponsibleExampleFile() {
+            // Create sample data
+            const sampleData = [
+                ['รหัสโรค', 'ผู้รับผิดชอบ', 'ตำแหน่ง', 'ผู้ตรวจทาน', 'ตำแหน่งผู้ตรวจทาน'],
+                ['A00', 'นายสมชาย ใจดี', 'นักวิชาการสาธารณสุข', 'นายสมศักดิ์ รู้ดี', 'หัวหน้ากลุ่มงาน'],
+                ['B01', 'นางสาวสุนิสา เก่งดี', 'เจ้าหน้าที่สาธารณสุข', 'นายสมพร ดีใจ', 'ผู้อำนวยการ'],
+                ['C02', 'นายอนุชา มั่นใจ', 'แพทย์', 'นางสาวมาลี ยิ้มแย้ม', 'หัวหน้าแผนก'],
+                ['D03', 'นางประทิน สุขใส', 'พยาบาล', 'นายวิชาญ รอบรู้', 'หัวหน้าหอผู้ป่วย'],
+                ['E04', 'นายธนากร เข้มแข็ง', 'เภสัชกร', 'นางสาววิไล อ่อนโยน', 'หัวหน้าเภสัชกรรม'],
+                ['F05', 'นางสาวนิภา เอื้อเฟื้อ', 'นักโภชนาการ', 'นายสำราญ มีสุข', 'หัวหน้าโภชนาการ'],
+                ['G06', 'นายชัยวัฒน์ ก้าวหน้า', 'นักกายภาพบำบัด', 'นางสุมาลี ชำนาญ', 'หัวหน้าฟื้นฟู'],
+                ['H07', 'นางสาวปราณี ใส่ใจ', 'นักสังคมสงเคราะห์', 'นายประสิทธิ์ ดำรง', 'หัวหน้าสังคมสงเคราะห์']
+            ];
+
+            // Create workbook and worksheet
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(sampleData);
+
+            // Set column widths
+            ws['!cols'] = [
+                { wch: 10 },  // รหัสโรค
+                { wch: 20 },  // ผู้รับผิดชอบ
+                { wch: 25 },  // ตำแหน่ง
+                { wch: 20 },  // ผู้ตรวจทาน
+                { wch: 25 }   // ตำแหน่งผู้ตรวจทาน
+            ];
+
+            // Style the header row
+            const headerStyle = {
+                font: { bold: true, color: { rgb: "000000" } },
+                fill: { fgColor: { rgb: "FFE082" } },
+                alignment: { horizontal: "center", vertical: "center" }
+            };
+
+            // Apply header styling
+            ['A1', 'B1', 'C1', 'D1', 'E1'].forEach(cell => {
+                if (ws[cell]) ws[cell].s = headerStyle;
+            });
+
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'ผู้รับผิดชอบ');
+
+            // Generate filename with current date
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0].replace(/-/g, '');
+            const filename = `ตัวอย่าง_ผู้รับผิดชอบจัดทำรายงาน_${dateStr}.xlsx`;
+
+            // Download the file
+            XLSX.writeFile(wb, filename);
+
+            // Show notification
+            showNotification('ดาวน์โหลดไฟล์ตัวอย่างเรียบร้อยแล้ว!', 'success');
         }
 
         // Download example Excel file for diseases
