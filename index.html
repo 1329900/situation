@@ -2973,9 +2973,125 @@
             return Object.values(districtCounts).sort((a, b) => b.subdistricts - a.subdistricts);
         }
 
-        function loadEpidemicWeeksTable() {
+        async function loadEpidemicWeeksTable() {
+            const epidemicWeeks = await loadFromFirebase('epidemicWeeks');
             const content = document.getElementById('masterDataDetailContent');
-            content.innerHTML = '<div class="text-center py-20"><div class="text-6xl mb-4">🏗️</div><p class="font-semibold text-xl text-gray-700">ตารางนี้จะพัฒนาในเวอร์ชั่นต่อไป</p></div>';
+            
+            content.innerHTML = `
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 bg-clip-text text-transparent">
+                        📅 ข้อมูลสัปดาห์การระบาด
+                    </h3>
+                    <button onclick="addNewMasterData('epidemicWeeks')" class="btn-primary text-sm px-4 py-2">
+                        <svg class="w-4 h-4 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                        </svg>
+                        เพิ่มสัปดาห์การระบาด
+                    </button>
+                </div>
+                
+                ${epidemicWeeks && epidemicWeeks.length > 0 ? `
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 bg-white rounded-lg shadow">
+                            <thead class="bg-gradient-to-r from-green-50 to-emerald-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ลำดับ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ปี</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">สัปดาห์ที่</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่เริ่มต้น</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">วันที่สิ้นสุด</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">หมายเหตุ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">การจัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                ${epidemicWeeks.map((week, index) => `
+                                    <tr class="hover:bg-gray-50 transition-colors">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">${week.year}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${week.weekNumber}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(week.startDate)}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${formatDate(week.endDate)}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">${week.note || '-'}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <div class="flex space-x-2">
+                                                <button onclick="editEpidemicWeek(${index})" class="text-blue-600 hover:text-blue-900 transition-colors">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                                    </svg>
+                                                </button>
+                                                <button onclick="deleteEpidemicWeek(${index})" class="text-red-600 hover:text-red-900 transition-colors">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"/>
+                                                    </svg>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="mt-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-4">
+                        <h4 class="font-bold text-gray-700 mb-3 flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                            </svg>
+                            สรุปข้อมูลสัปดาห์การระบาด
+                        </h4>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">จำนวนสัปดาห์ทั้งหมด</div>
+                                <div class="text-2xl font-bold text-blue-600">${epidemicWeeks.length}</div>
+                            </div>
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">ปีล่าสุด</div>
+                                <div class="text-2xl font-bold text-green-600">${getLatestYear(epidemicWeeks)}</div>
+                            </div>
+                            <div class="bg-white rounded p-3 shadow-sm">
+                                <div class="text-gray-600">สัปดาห์ล่าสุด</div>
+                                <div class="text-2xl font-bold text-purple-600">${getLatestWeek(epidemicWeeks)}</div>
+                            </div>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="text-center py-20">
+                        <div class="text-6xl mb-4">📅</div>
+                        <h3 class="text-xl font-semibold text-gray-700 mb-2">ยังไม่มีข้อมูลสัปดาห์การระบาด</h3>
+                        <p class="text-gray-500 mb-6">เริ่มต้นโดยการเพิ่มข้อมูลสัปดาห์การระบาดใหม่</p>
+                        <button onclick="addNewMasterData('epidemicWeeks')" class="btn-primary">
+                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                            </svg>
+                            เพิ่มสัปดาห์การระบาดใหม่
+                        </button>
+                    </div>
+                `}
+            `;
+        }
+
+        // Helper functions for epidemic weeks
+        function getLatestYear(epidemicWeeks) {
+            if (!epidemicWeeks || epidemicWeeks.length === 0) return '-';
+            return Math.max(...epidemicWeeks.map(w => parseInt(w.year)));
+        }
+
+        function getLatestWeek(epidemicWeeks) {
+            if (!epidemicWeeks || epidemicWeeks.length === 0) return '-';
+            const latestYear = getLatestYear(epidemicWeeks);
+            const weeksInLatestYear = epidemicWeeks.filter(w => parseInt(w.year) === latestYear);
+            return Math.max(...weeksInLatestYear.map(w => parseInt(w.weekNumber)));
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('th-TH', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
         }
 
         // Clear all patients data
@@ -3178,6 +3294,8 @@
                 showThailandPopulationForm();
             } else if (type === 'bangkokDistricts') {
                 showBangkokDistrictForm();
+            } else if (type === 'epidemicWeeks') {
+                showEpidemicWeekForm();
             } else {
                 alert(`ฟีเจอร์เพิ่มข้อมูล ${type} จะพัฒนาในเวอร์ชั่นต่อไป พร้อมฟอร์มที่สวยงามและใช้งานง่าย`);
             }
@@ -4708,6 +4826,17 @@
             if (e.target && e.target.id === 'bangkokSubdistrict') {
                 updateDistrictPreview();
             }
+            // Event listeners for epidemic week form
+            if (e.target && (e.target.id === 'epidemicYear' || e.target.id === 'epidemicWeekNumber')) {
+                updatePreview();
+            }
+        });
+
+        // Add event listener for date changes
+        document.addEventListener('change', function(e) {
+            if (e.target && (e.target.id === 'epidemicStartDate' || e.target.id === 'epidemicEndDate')) {
+                updatePreview();
+            }
         });
 
         // Populate form for editing
@@ -4836,6 +4965,352 @@
                     
                 } catch (error) {
                     console.error('Error deleting Bangkok district:', error);
+                    showNotification('เกิดข้อผิดพลาดในการลบข้อมูล', 'error');
+                }
+            }
+        }
+
+        // Epidemic Week management functions
+        function showEpidemicWeekForm(editIndex = null) {
+            const isEdit = editIndex !== null;
+            const title = isEdit ? 'แก้ไขข้อมูลสัปดาห์การระบาด' : 'เพิ่มข้อมูลสัปดาห์การระบาดใหม่';
+            
+            // Create modal overlay
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modalOverlay.id = 'epidemicWeekModal';
+            
+            modalOverlay.innerHTML = `
+                <div class="glass-card p-8 max-w-2xl w-full mx-4 animate-slideInFromTop max-h-[90vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-2xl font-bold bg-gradient-to-r from-green-800 to-green-600 bg-clip-text text-transparent">
+                            📅 ${title}
+                        </h3>
+                        <button onclick="closeEpidemicWeekModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form id="epidemicWeekForm" onsubmit="saveEpidemicWeekData(event, ${editIndex})">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label for="epidemicYear" class="block text-sm font-medium text-gray-700 mb-2">ปี</label>
+                                <input type="number" id="epidemicYear" min="2020" max="2030" value="${new Date().getFullYear()}"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    placeholder="เช่น 2024" onchange="calculateWeekDates()" required>
+                            </div>
+                            
+                            <div>
+                                <label for="epidemicWeekNumber" class="block text-sm font-medium text-gray-700 mb-2">สัปดาห์ที่</label>
+                                <input type="number" id="epidemicWeekNumber" min="1" max="53"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    placeholder="เช่น 1" onchange="calculateWeekDates()" required>
+                            </div>
+                            
+                            <div>
+                                <label for="epidemicStartDate" class="block text-sm font-medium text-gray-700 mb-2">วันที่เริ่มต้น</label>
+                                <input type="date" id="epidemicStartDate"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    onchange="updateEndDate()" required>
+                            </div>
+                            
+                            <div>
+                                <label for="epidemicEndDate" class="block text-sm font-medium text-gray-700 mb-2">วันที่สิ้นสุด</label>
+                                <input type="date" id="epidemicEndDate"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    required>
+                            </div>
+                            
+                            <div class="md:col-span-2">
+                                <label for="epidemicNote" class="block text-sm font-medium text-gray-700 mb-2">หมายเหตุ (ถ้ามี)</label>
+                                <textarea id="epidemicNote" rows="3"
+                                    class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                                    placeholder="หมายเหตุเพิ่มเติมเกี่ยวกับสัปดาห์การระบาดนี้..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- Week Preview -->
+                        <div id="epidemicWeekPreview" class="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg hidden">
+                            <h4 class="font-bold text-gray-700 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"/>
+                                </svg>
+                                ตัวอย่างข้อมูลสัปดาห์การระบาด
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div class="bg-white rounded p-3 shadow-sm">
+                                    <div class="text-gray-600">ปี/สัปดาห์</div>
+                                    <div class="text-lg font-bold text-blue-600" id="previewYearWeek">-</div>
+                                </div>
+                                <div class="bg-white rounded p-3 shadow-sm">
+                                    <div class="text-gray-600">วันที่เริ่มต้น</div>
+                                    <div class="text-lg font-bold text-green-600" id="previewStartDate">-</div>
+                                </div>
+                                <div class="bg-white rounded p-3 shadow-sm">
+                                    <div class="text-gray-600">วันที่สิ้นสุด</div>
+                                    <div class="text-lg font-bold text-purple-600" id="previewEndDate">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-4 mt-8">
+                            <button type="submit" class="flex-1 btn-primary">
+                                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
+                                </svg>
+                                ${isEdit ? 'บันทึกการแก้ไข' : 'เพิ่มข้อมูล'}
+                            </button>
+                            <button type="button" onclick="closeEpidemicWeekModal()" class="flex-1 btn-secondary">
+                                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                                </svg>
+                                ยกเลิก
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modalOverlay);
+            
+            // If editing, populate form with existing data
+            if (isEdit) {
+                populateEpidemicWeekForm(editIndex);
+            }
+            
+            // Calculate initial week dates
+            calculateWeekDates();
+            
+            // Focus on first input
+            setTimeout(() => {
+                document.getElementById('epidemicWeekNumber').focus();
+            }, 100);
+        }
+
+        // Calculate week dates based on year and week number
+        function calculateWeekDates() {
+            const year = parseInt(document.getElementById('epidemicYear').value);
+            const weekNumber = parseInt(document.getElementById('epidemicWeekNumber').value);
+            
+            if (!year || !weekNumber) return;
+            
+            // Calculate the start date of the epidemic week
+            const startDate = getDateOfWeek(year, weekNumber);
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 6);
+            
+            // Format dates for input fields
+            document.getElementById('epidemicStartDate').value = formatDateForInput(startDate);
+            document.getElementById('epidemicEndDate').value = formatDateForInput(endDate);
+            
+            updatePreview();
+        }
+
+        // Update end date when start date changes
+        function updateEndDate() {
+            const startDate = new Date(document.getElementById('epidemicStartDate').value);
+            if (startDate) {
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                document.getElementById('epidemicEndDate').value = formatDateForInput(endDate);
+                updatePreview();
+            }
+        }
+
+        // Update preview information
+        function updatePreview() {
+            const year = document.getElementById('epidemicYear').value;
+            const weekNumber = document.getElementById('epidemicWeekNumber').value;
+            const startDate = document.getElementById('epidemicStartDate').value;
+            const endDate = document.getElementById('epidemicEndDate').value;
+            
+            if (year && weekNumber && startDate && endDate) {
+                document.getElementById('previewYearWeek').textContent = `${year}/${weekNumber}`;
+                document.getElementById('previewStartDate').textContent = formatDateThai(startDate);
+                document.getElementById('previewEndDate').textContent = formatDateThai(endDate);
+                document.getElementById('epidemicWeekPreview').classList.remove('hidden');
+            } else {
+                document.getElementById('epidemicWeekPreview').classList.add('hidden');
+            }
+        }
+
+        // Helper function to get the start date of a week
+        function getDateOfWeek(year, week) {
+            const simple = new Date(year, 0, 1 + (week - 1) * 7);
+            const dow = simple.getDay();
+            const ISOweekStart = simple;
+            if (dow <= 4)
+                ISOweekStart.setDate(simple.getDate() - simple.getDay() + 1);
+            else
+                ISOweekStart.setDate(simple.getDate() + 8 - simple.getDay());
+            return ISOweekStart;
+        }
+
+        // Helper function to format date for input
+        function formatDateForInput(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        // Helper function to format date in Thai
+        function formatDateThai(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('th-TH', {
+                weekday: 'short',
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric'
+            });
+        }
+
+        // Populate form for editing
+        async function populateEpidemicWeekForm(index) {
+            const epidemicWeeks = await loadFromFirebase('epidemicWeeks');
+            const week = epidemicWeeks[index];
+            
+            if (week) {
+                document.getElementById('epidemicYear').value = week.year;
+                document.getElementById('epidemicWeekNumber').value = week.weekNumber;
+                document.getElementById('epidemicStartDate').value = week.startDate;
+                document.getElementById('epidemicEndDate').value = week.endDate;
+                document.getElementById('epidemicNote').value = week.note || '';
+                updatePreview();
+            }
+        }
+
+        // Close epidemic week modal
+        function closeEpidemicWeekModal() {
+            const modal = document.getElementById('epidemicWeekModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Save epidemic week data
+        async function saveEpidemicWeekData(event, editIndex = null) {
+            event.preventDefault();
+            
+            const year = document.getElementById('epidemicYear').value;
+            const weekNumber = parseInt(document.getElementById('epidemicWeekNumber').value);
+            const startDate = document.getElementById('epidemicStartDate').value;
+            const endDate = document.getElementById('epidemicEndDate').value;
+            const note = document.getElementById('epidemicNote').value.trim();
+            
+            if (!year || !weekNumber || !startDate || !endDate) {
+                showNotification('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+            
+            // Validate week number
+            if (weekNumber < 1 || weekNumber > 53) {
+                showNotification('สัปดาห์ที่ต้องอยู่ระหว่าง 1-53', 'error');
+                return;
+            }
+            
+            // Validate dates
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (end <= start) {
+                showNotification('วันที่สิ้นสุดต้องมากกว่าวันที่เริ่มต้น', 'error');
+                return;
+            }
+            
+            // Show loading
+            const submitBtn = event.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = `
+                <svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                กำลังบันทึก...
+            `;
+            submitBtn.disabled = true;
+            
+            try {
+                const epidemicWeeks = await loadFromFirebase('epidemicWeeks');
+                
+                // Check for duplicate year/week combination (only if not editing the same record)
+                const existingIndex = epidemicWeeks.findIndex(w => 
+                    parseInt(w.year) === parseInt(year) && 
+                    parseInt(w.weekNumber) === weekNumber
+                );
+                if (existingIndex !== -1 && existingIndex !== editIndex) {
+                    showNotification(`ข้อมูลสัปดาห์ที่ ${weekNumber} ปี ${year} มีอยู่แล้ว กรุณาแก้ไขข้อมูลเดิมแทน`, 'error');
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                const newEpidemicWeek = {
+                    year: year.toString(),
+                    weekNumber: weekNumber.toString(),
+                    startDate,
+                    endDate,
+                    note: note || ''
+                };
+                
+                if (editIndex !== null) {
+                    // Edit existing epidemic week
+                    epidemicWeeks[editIndex] = newEpidemicWeek;
+                    showNotification('แก้ไขข้อมูลสัปดาห์การระบาดสำเร็จ!', 'success');
+                } else {
+                    // Add new epidemic week
+                    epidemicWeeks.push(newEpidemicWeek);
+                    showNotification('เพิ่มข้อมูลสัปดาห์การระบาดใหม่สำเร็จ!', 'success');
+                }
+                
+                // Save to Firebase
+                await saveToFirebase('epidemicWeeks', epidemicWeeks);
+                
+                // Close modal
+                closeEpidemicWeekModal();
+                
+                // Refresh table
+                await loadEpidemicWeeksTable();
+                
+            } catch (error) {
+                console.error('Error saving epidemic week:', error);
+                showNotification('เกิดข้อผิดพลาดในการบันทึกข้อมูล', 'error');
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+
+        // Edit epidemic week function
+        function editEpidemicWeek(index) {
+            showEpidemicWeekForm(index);
+        }
+
+        // Delete epidemic week function
+        async function deleteEpidemicWeek(index) {
+            const epidemicWeeks = await loadFromFirebase('epidemicWeeks');
+            const week = epidemicWeeks[index];
+            
+            if (!week) {
+                showNotification('ไม่พบข้อมูลสัปดาห์การระบาดที่ต้องการลบ', 'error');
+                return;
+            }
+            
+            const confirmed = confirm(`คุณต้องการลบข้อมูลสัปดาห์การระบาดนี้ใช่หรือไม่?\n\nปี: ${week.year}\nสัปดาห์ที่: ${week.weekNumber}\nช่วงวันที่: ${formatDateThai(week.startDate)} - ${formatDateThai(week.endDate)}\n\nการดำเนินการนี้ไม่สามารถยกเลิกได้`);
+            
+            if (confirmed) {
+                try {
+                    // Remove from array
+                    epidemicWeeks.splice(index, 1);
+                    
+                    // Save to Firebase
+                    await saveToFirebase('epidemicWeeks', epidemicWeeks);
+                    
+                    // Refresh table
+                    await loadEpidemicWeeksTable();
+                    
+                    showNotification('ลบข้อมูลสัปดาห์การระบาดสำเร็จ!', 'success');
+                    
+                } catch (error) {
+                    console.error('Error deleting epidemic week:', error);
                     showNotification('เกิดข้อผิดพลาดในการลบข้อมูล', 'error');
                 }
             }
