@@ -5575,6 +5575,59 @@
                             `}
                             <p>• <strong>แถวแรก:</strong> สามารถเป็นหัวตารางหรือข้อมูลได้</p>
                         </div>
+                        
+                        ${!isResponsible && !isPopulation ? `
+                        <!-- Example Table for Disease Import -->
+                        <div class="mt-4 p-4 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg">
+                            <h5 class="font-bold text-green-800 mb-3 flex items-center">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/>
+                                </svg>
+                                ตัวอย่างข้อมูลในไฟล์ Excel
+                            </h5>
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full text-sm border border-gray-300 rounded">
+                                    <thead class="bg-gray-100">
+                                        <tr>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">A</th>
+                                            <th class="px-3 py-2 border border-gray-300 text-left font-bold text-gray-700">B</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white">
+                                        <tr class="bg-yellow-50">
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">รหัสโรค</td>
+                                            <td class="px-3 py-2 border border-gray-300 text-gray-600 italic">ชื่อโรค</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">A00</td>
+                                            <td class="px-3 py-2 border border-gray-300">อหิวาตกโรค</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">B01</td>
+                                            <td class="px-3 py-2 border border-gray-300">โรคไข้หวัดใหญ่</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">C02</td>
+                                            <td class="px-3 py-2 border border-gray-300">โรคติดเชื้อทางเดินหายใจ</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">D03</td>
+                                            <td class="px-3 py-2 border border-gray-300">โรคท้องเสีย</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="px-3 py-2 border border-gray-300 font-mono text-blue-600">E04</td>
+                                            <td class="px-3 py-2 border border-gray-300">โรคเบาหวาน</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="mt-3 text-xs text-green-700 space-y-1">
+                                <p>• <strong>แถวสีเหลือง:</strong> หัวตาราง (สามารถข้ามได้โดยเลือก "ข้ามแถวแรก")</p>
+                                <p>• <strong>รหัสโรค:</strong> ใช้รหัสมาตรฐาน ICD-10 หรือรหัสที่กำหนดเอง</p>
+                                <p>• <strong>ชื่อโรค:</strong> ชื่อเต็มของโรคภาษาไทย</p>
+                            </div>
+                        </div>
+                        ` : ''}
                     </div>
                     
                     <!-- File Upload -->
